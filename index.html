@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Orji Supplies - Enhanced Management System</title>
-    <meta name="description" content="Fully functional stock management system with variable pricing, debt tracking, and email backup">
+    <meta name="description" content="Fully functional stock management system with full edit capabilities">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -171,8 +171,16 @@
         .badmsg { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 12px; border-radius: 10px; margin: 12px 0; }
         .section-tools { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
         .compact-table th, .compact-table td { padding: 8px 10px; font-size: 13px; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            padding: 24px; border-radius: 12px; width: 90%; max-width: 600px;
+            max-height: 85vh; overflow-y: auto;
+            background: white;
+        }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .close-modal { cursor: pointer; font-size: 28px; color: var(--muted); }
         .close-modal:hover { color: var(--ink); }
@@ -181,16 +189,10 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .data-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
         .data-row:last-child { border-bottom: none; }
-        .category-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; background: var(--brand); color: white; }
         .highlight { background: #fef3c7; border-left: 3px solid #f59e0b; }
         .low-stock { background: #fee2e2; border-left: 3px solid #ef4444; }
         .profit-positive { color: var(--ok); font-weight: 600; }
         .profit-negative { color: var(--bad); font-weight: 600; }
-        .status-paid { color: var(--ok); font-weight: 600; }
-        .status-unpaid { color: var(--bad); font-weight: 600; }
-        .status-partial { color: var(--warn); font-weight: 600; }
-        .email-section { background: rgba(255,255,255,0.9); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-top: 12px; }
-        .email-section input { width: auto; flex: 1; min-width: 200px; }
         .background-controls {
             position: fixed;
             bottom: 20px;
@@ -214,6 +216,9 @@
         .bg-btn.active { background: var(--brand); transform: scale(1.2); border-color: white; }
         .bg-pause { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); padding: 0 5px; }
         .bg-pause:hover { color: var(--brand); }
+        .edit-btn { background: var(--warn); color: white; border-color: var(--warn); padding: 4px 10px; font-size: 12px; }
+        .edit-btn:hover { background: #d97706; }
+        .edit-mode { border-left: 4px solid var(--warn); }
         @media (max-width: 1200px) { .grid-4 { grid-template-columns: repeat(2,1fr); } }
         @media (max-width: 768px) {
             .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
@@ -358,7 +363,7 @@
                         <div><label>To Date</label><input type="date" id="saleTo"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterSales">Filter</button></div>
                     </div>
-                    <div><table class="table compact-table" id="salesHistoryTable"><thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total Sales</th><th>Profit/Loss</th></tr></thead><tbody></tbody></table></div>
+                    <div><table class="table compact-table" id="salesHistoryTable"><thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total Sales</th><th>Profit/Loss</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
                 </div>
             </div>
         </section>
@@ -388,7 +393,7 @@
                         <div><label>To Date</label><input type="date" id="purchaseTo"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterPurchases">Filter</button></div>
                     </div>
-                    <div><table class="table compact-table" id="purchasesTable"><thead><tr><th>Date</th><th>Product</th><th>Qty</th><th>Unit Cost</th><th>Total Cost</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
+                    <div><table class="table compact-table" id="purchasesTable"><thead><tr><th>Date</th><th>Product</th><th>Qty</th><th>Unit Cost</th><th>Total Cost</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
                     <div class="right" style="margin-top:16px;"><div class="stat"><span class="muted">Total Purchase Cost</span><b id="totalPurchases">UGX 0</b></div></div>
                 </div>
             </div>
@@ -417,7 +422,7 @@
                         <div><label>To Date</label><input type="date" id="expenseTo"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterExpenses">Filter</button></div>
                     </div>
-                    <div><table class="table compact-table" id="expensesTable"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
+                    <div><table class="table compact-table" id="expensesTable"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
                     <div class="right" style="margin-top:16px;"><div class="stat"><span class="muted">Total Expenses</span><b id="totalExpenses">UGX 0</b></div></div>
                 </div>
             </div>
@@ -456,7 +461,7 @@
                         <div><label>From Date</label><input type="date" id="debtFrom"></div>
                         <div><label>To Date</label><input type="date" id="debtTo"></div>
                     </div>
-                    <div><table class="table compact-table" id="debtsTable"><thead><tr><th>Date</th><th>Customer</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Status</th><th>Due Date</th><th class="no-print">Action</th></tr></thead><tbody></tbody></table></div>
+                    <div><table class="table compact-table" id="debtsTable"><thead><tr><th>Date</th><th>Customer</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Status</th><th>Due Date</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
                     <div class="right" style="margin-top:16px;">
                         <div class="stat"><span class="muted">Total Outstanding</span><b id="totalOutstanding" style="color:var(--bad);">UGX 0</b></div>
                     </div>
@@ -511,7 +516,7 @@
                         <input type="text" id="productSearch" placeholder="Search products..." style="flex:1;">
                         <select id="productSort"><option value="name">Sort by Name</option><option value="category">Sort by Category</option><option value="stock">Sort by Stock</option><option value="profit">Sort by Profit Margin</option></select>
                     </div>
-                    <div><table class="table" id="productsTable"><thead><tr><th>Product</th><th>Category</th><th>Purchase Price</th><th>Sale Price</th><th>Profit Margin</th><th>Opening Stock</th><th>Sold</th><th>Current Stock</th><th>Status</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
+                    <div><table class="table" id="productsTable"><thead><tr><th>Product</th><th>Category</th><th>Purchase Price</th><th>Sale Price</th><th>Profit Margin</th><th>Opening Stock</th><th>Sold</th><th>Current Stock</th><th>Status</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
                 </div>
             </div>
         </section>
@@ -569,6 +574,21 @@
         </section>
     </main>
 
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="editModalTitle">Edit Record</h3>
+                <span class="close-modal" id="editModalClose">&times;</span>
+            </div>
+            <div id="editModalBody"></div>
+            <div class="right" style="margin-top:20px;">
+                <button class="btn bad" id="editModalCancel">Cancel</button>
+                <button class="btn primary" id="editModalSave">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <div id="loading" class="loading no-print"><div class="loading-spinner"></div><p>Processing...</p></div>
 
     <script>
@@ -613,9 +633,10 @@
         const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
         function download(filename, blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
         function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
+        function generateId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6); }
 
         // ================ DATA MANAGEMENT ================
-        const STORAGE_KEY = 'orji_supplies_enhanced_v3';
+        const STORAGE_KEY = 'orji_supplies_enhanced_v4';
         let db = {
             products: [],
             dailySheets: {},
@@ -634,6 +655,59 @@
             const el = document.getElementById('lastSaveTime');
             if (el && db.settings.lastSave) { const d = new Date(db.settings.lastSave); el.textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString(); }
         }
+
+        // ================ RECALCULATION ENGINE ================
+        function recalculateAll() {
+            // Reset all product stats
+            db.products.forEach(p => {
+                p.soldCount = 0;
+                p.totalProfit = 0;
+                p.currentStock = p.openingStock || 0;
+            });
+
+            // Recalculate from purchases
+            db.purchases.forEach(pur => {
+                const product = db.products.find(p => p.id === pur.productId);
+                if (product) {
+                    product.currentStock = (product.currentStock || 0) + pur.quantity;
+                }
+            });
+
+            // Recalculate from sales
+            Object.values(db.dailySheets).forEach(sheet => {
+                sheet.items.forEach(item => {
+                    const product = db.products.find(p => p.name === item.productName);
+                    if (product) {
+                        product.soldCount = (product.soldCount || 0) + item.quantity;
+                        product.totalProfit = (product.totalProfit || 0) + item.profit;
+                        product.currentStock = Math.max(0, (product.currentStock || 0) - item.quantity);
+                    }
+                });
+                // Recalculate sheet totals
+                sheet.totalSales = sheet.items.reduce((s, i) => s + i.total, 0);
+                sheet.totalProfit = sheet.items.reduce((s, i) => s + i.profit, 0);
+            });
+
+            saveData();
+        }
+
+        // ================ EDIT MODAL ================
+        let editContext = { type: '', id: '', data: null };
+
+        function openEditModal(title, html, saveCallback) {
+            document.getElementById('editModalTitle').textContent = title;
+            document.getElementById('editModalBody').innerHTML = html;
+            document.getElementById('editModal').style.display = 'flex';
+            document.getElementById('editModalSave').onclick = saveCallback;
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        document.getElementById('editModalClose').addEventListener('click', closeEditModal);
+        document.getElementById('editModalCancel').addEventListener('click', closeEditModal);
+        window.addEventListener('click', (e) => { if (e.target === document.getElementById('editModal')) closeEditModal(); });
 
         // ================ CATEGORY HELPER ================
         function getCategoryColor(cat) {
@@ -668,7 +742,6 @@
             let mCat = '-', mMax = 0; for (const [c, s] of Object.entries(catSales)) { if (s > mMax) { mMax = s; mCat = c; } }
             document.getElementById('statMostMoving').textContent = `${mCat} (${mMax} units)`;
 
-            // Debts
             let outstanding = 0;
             db.debts.forEach(d => { if (d.status !== 'paid') outstanding += (d.amount - d.paidAmount); });
             document.getElementById('statOutstandingDebts').textContent = UGX(outstanding);
@@ -687,7 +760,6 @@
             else if (netProfit < 0) { statusEl.innerHTML = `<strong>⚠️ LOSS MAKING:</strong> Net loss of ${UGX(Math.abs(netProfit))}`; statusEl.className = 'badmsg'; }
             else { statusEl.innerHTML = `<strong>⚖️ BREAK EVEN:</strong> Business is breaking even`; statusEl.className = 'warnmsg'; }
 
-            // Low stock alerts
             updateLowStockAlerts();
         }
 
@@ -737,7 +809,7 @@
                         <td>${p.soldCount||0}</td>
                         <td><strong>${stock}</strong></td>
                         <td>${status}</td>
-                        <td class="no-print"><button class="btn" data-edit="${p.id}">Edit</button></td>
+                        <td class="no-print"><button class="btn edit-btn" data-edit-product="${p.id}">✎ Edit</button></td>
                     </tr>`;
                 }).join('');
             }
@@ -773,8 +845,8 @@
 
         function setupProducts() {
             document.getElementById('productsTable').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-edit]'); if (!btn) return;
-                const id = btn.getAttribute('data-edit'); const p = db.products.find(x => x.id === id); if (!p) return;
+                const btn = e.target.closest('[data-edit-product]'); if (!btn) return;
+                const id = btn.getAttribute('data-edit-product'); const p = db.products.find(x => x.id === id); if (!p) return;
                 editingProductId = id;
                 document.getElementById('productName').value = p.name;
                 document.getElementById('productCategory').value = p.category || '';
@@ -783,6 +855,8 @@
                 document.getElementById('productOpeningStock').value = p.openingStock || 0;
                 document.getElementById('productMinStock').value = p.minStockLevel || 20;
                 document.getElementById('btnDeleteProduct').disabled = false;
+                // Scroll to form
+                document.getElementById('productName').scrollIntoView({ behavior: 'smooth' });
             });
             document.getElementById('btnSaveProduct').addEventListener('click', () => {
                 const name = document.getElementById('productName').value.trim(); if (!name) { alert('Please enter product name'); return; }
@@ -793,26 +867,45 @@
                 const min = parseInt(document.getElementById('productMinStock').value) || 20;
                 if (editingProductId) {
                     const p = db.products.find(x => x.id === editingProductId);
-                    if (p) { p.name = name; p.category = cat; p.purchasePrice = cost; p.salePrice = price; p.openingStock = opening; p.minStockLevel = min; if (p.currentStock === undefined) p.currentStock = opening; }
+                    if (p) { 
+                        const oldOpening = p.openingStock || 0;
+                        p.name = name; p.category = cat; p.purchasePrice = cost; p.salePrice = price; 
+                        p.openingStock = opening; p.minStockLevel = min;
+                        // Adjust current stock if opening changed
+                        if (p.currentStock !== undefined) {
+                            p.currentStock = p.currentStock - oldOpening + opening;
+                        } else {
+                            p.currentStock = opening;
+                        }
+                    }
                 } else {
-                    db.products.push({ id: 'prod_' + Date.now(), name, category: cat, purchasePrice: cost, salePrice: price, openingStock: opening, currentStock: opening, minStockLevel: min, soldCount: 0, totalProfit: 0 });
+                    db.products.push({ id: generateId(), name, category: cat, purchasePrice: cost, salePrice: price, openingStock: opening, currentStock: opening, minStockLevel: min, soldCount: 0, totalProfit: 0 });
                 }
+                recalculateAll();
                 saveData(); renderProducts(); updateDashboardStats(); populateProductSelects();
                 document.getElementById('productName').value = ''; document.getElementById('productCategory').value = '';
                 document.getElementById('productCost').value = '0'; document.getElementById('productPrice').value = '0';
                 document.getElementById('productOpeningStock').value = '0'; document.getElementById('productMinStock').value = '20';
                 document.getElementById('btnDeleteProduct').disabled = true; editingProductId = null;
-                alert('Product saved successfully!');
+                alert('Product saved and all data recalculated successfully!');
             });
             document.getElementById('btnDeleteProduct').addEventListener('click', () => {
-                if (!editingProductId || !confirm('Delete this product?')) return;
+                if (!editingProductId || !confirm('Delete this product? This will remove all associated data.')) return;
+                // Remove product from all sales
+                const product = db.products.find(p => p.id === editingProductId);
+                if (product) {
+                    Object.keys(db.dailySheets).forEach(date => {
+                        db.dailySheets[date].items = db.dailySheets[date].items.filter(i => i.productName !== product.name);
+                    });
+                }
                 db.products = db.products.filter(p => p.id !== editingProductId);
+                recalculateAll();
                 saveData(); renderProducts(); updateDashboardStats(); populateProductSelects();
                 document.getElementById('productName').value = ''; document.getElementById('productCategory').value = '';
                 document.getElementById('productCost').value = '0'; document.getElementById('productPrice').value = '0';
                 document.getElementById('productOpeningStock').value = '0'; document.getElementById('productMinStock').value = '20';
                 document.getElementById('btnDeleteProduct').disabled = true; editingProductId = null;
-                alert('Product deleted.');
+                alert('Product deleted and all data recalculated.');
             });
             document.getElementById('productSearch').addEventListener('input', renderProducts);
             document.getElementById('productSort').addEventListener('change', renderProducts);
@@ -820,7 +913,19 @@
 
         // ================ SALES ================
         let dailySaleItems = [];
-        function renderSales() { dailySaleItems = []; document.getElementById('sheetReference').value = ''; document.getElementById('customerName').value = ''; document.getElementById('saleQty').value = '1'; document.getElementById('salePrice').value = ''; updateDailySaleTotal(); loadRecentSales(); }
+        let editingSaleDate = null;
+
+        function renderSales() { 
+            dailySaleItems = []; 
+            editingSaleDate = null;
+            document.getElementById('sheetReference').value = ''; 
+            document.getElementById('customerName').value = ''; 
+            document.getElementById('saleQty').value = '1'; 
+            document.getElementById('salePrice').value = ''; 
+            updateDailySaleTotal(); 
+            loadRecentSales(); 
+        }
+
         function updateDailySaleTotal() {
             const total = dailySaleItems.reduce((s, i) => s + (i.total || 0), 0);
             const profit = dailySaleItems.reduce((s, i) => s + (i.profit || 0), 0);
@@ -834,24 +939,52 @@
                 return `<tr><td>${item.productName}</td><td>${item.quantity}</td><td>${UGX(item.unitPrice)}</td><td>${UGX(item.total)}</td><td class="${profitClass}">${UGX(item.profit)}</td><td class="no-print"><button class="btn bad" data-remove-sale="${idx}">×</button></td></tr>`;
             }).join('');
         }
+
         function loadRecentSales() {
             const from = document.getElementById('saleFrom').value || todayStr(), to = document.getElementById('saleTo').value || todayStr();
             const filtered = []; for (const [date, sheet] of Object.entries(db.dailySheets)) { if (date >= from && date <= to) filtered.push({ date, ...sheet }); }
             filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
             const tbody = document.querySelector('#salesHistoryTable tbody');
-            if (tbody) tbody.innerHTML = filtered.map(s => {
-                const profit = s.totalProfit || 0;
-                const profitClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
-                return `<tr><td><strong>${s.date}</strong></td><td>${s.customer || '-'}</td><td>${s.items?.length||0} items</td><td>${UGX(s.totalSales||0)}</td><td class="${profitClass}">${UGX(profit)}</td></tr>`;
-            }).join('');
+            if (tbody) {
+                tbody.innerHTML = filtered.map(s => {
+                    const profit = s.totalProfit || 0;
+                    const profitClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
+                    return `<tr>
+                        <td><strong>${s.date}</strong></td>
+                        <td>${s.customer || '-'}</td>
+                        <td>${s.items?.length||0} items</td>
+                        <td>${UGX(s.totalSales||0)}</td>
+                        <td class="${profitClass}">${UGX(profit)}</td>
+                        <td class="no-print"><button class="btn edit-btn" data-edit-sale="${s.date}">✎ Edit</button></td>
+                    </tr>`;
+                }).join('');
+            }
         }
+
+        function editSale(date) {
+            const sheet = db.dailySheets[date];
+            if (!sheet) { alert('Sale record not found'); return; }
+            editingSaleDate = date;
+            document.getElementById('saleDate').value = date;
+            document.getElementById('sheetReference').value = sheet.sheetReference || '';
+            document.getElementById('customerName').value = sheet.customer || '';
+            dailySaleItems = sheet.items.map(item => ({ ...item }));
+            updateDailySaleTotal();
+            document.getElementById('saleDate').scrollIntoView({ behavior: 'smooth' });
+            alert(`Editing sale for ${date}. Make changes and click "Save Sales" to update.`);
+        }
+
         function setupSales() {
             document.getElementById('saleProduct').addEventListener('change', function() { const opt = this.options[this.selectedIndex]; if (opt && opt.value) document.getElementById('salePrice').value = opt.getAttribute('data-price') || ''; });
             document.getElementById('btnAddSaleItem').addEventListener('click', () => {
                 const pid = document.getElementById('saleProduct').value, qty = parseInt(document.getElementById('saleQty').value) || 1, price = parseInt(document.getElementById('salePrice').value) || 0;
                 if (!pid) { alert('Select a product'); return; } if (qty <= 0) { alert('Enter valid quantity'); return; } if (price <= 0) { alert('Enter valid price'); return; }
                 const p = db.products.find(x => x.id === pid); if (!p) { alert('Product not found'); return; }
-                const stock = p.currentStock || p.openingStock || 0; if (stock < qty && !confirm(`Only ${stock} items in stock. Continue?`)) return;
+                // For editing, we don't check stock as it might be a correction
+                if (!editingSaleDate) {
+                    const stock = p.currentStock || p.openingStock || 0; 
+                    if (stock < qty && !confirm(`Only ${stock} items in stock. Continue?`)) return;
+                }
                 const total = qty * price; const profit = qty * (price - p.purchasePrice);
                 dailySaleItems.push({ productId: pid, productName: p.name, quantity: qty, unitPrice: price, total, profit });
                 updateDailySaleTotal(); document.getElementById('saleQty').value = '1'; document.getElementById('salePrice').value = '';
@@ -865,59 +998,141 @@
                 const date = document.getElementById('saleDate').value || todayStr();
                 const ref = document.getElementById('sheetReference').value.trim() || 'manual';
                 const customer = document.getElementById('customerName').value.trim() || '';
-                if (db.dailySheets[date] && !confirm(`Record exists for ${date}. Overwrite?`)) return;
+                
+                if (editingSaleDate) {
+                    // Remove old sale data from products
+                    const oldSheet = db.dailySheets[editingSaleDate];
+                    if (oldSheet) {
+                        oldSheet.items.forEach(item => {
+                            const p = db.products.find(x => x.name === item.productName);
+                            if (p) {
+                                p.soldCount = Math.max(0, (p.soldCount || 0) - item.quantity);
+                                p.totalProfit = Math.max(0, (p.totalProfit || 0) - item.profit);
+                                p.currentStock = (p.currentStock || 0) + item.quantity;
+                            }
+                        });
+                    }
+                    delete db.dailySheets[editingSaleDate];
+                }
+
                 const total = dailySaleItems.reduce((s, i) => s + i.total, 0);
                 const profit = dailySaleItems.reduce((s, i) => s + i.profit, 0);
                 dailySaleItems.forEach(item => {
                     const p = db.products.find(x => x.id === item.productId);
-                    if (p) { p.currentStock = Math.max(0, (p.currentStock || p.openingStock || 0) - item.quantity); p.soldCount = (p.soldCount || 0) + item.quantity; p.totalProfit = (p.totalProfit || 0) + item.profit; }
+                    if (p) { 
+                        p.currentStock = Math.max(0, (p.currentStock || p.openingStock || 0) - item.quantity); 
+                        p.soldCount = (p.soldCount || 0) + item.quantity; 
+                        p.totalProfit = (p.totalProfit || 0) + item.profit; 
+                    }
                 });
                 db.dailySheets[date] = { date, items: [...dailySaleItems], totalSales: total, totalProfit: profit, source: 'manual', sheetReference: ref, customer, recordedAt: new Date().toISOString() };
-                saveData(); renderSales(); renderProducts(); renderInventory(); updateDashboardStats();
-                alert(`Sales saved for ${date}! Total: ${UGX(total)}, Profit: ${UGX(profit)}`);
+                recalculateAll();
+                saveData(); 
+                renderSales(); 
+                renderProducts(); 
+                renderInventory(); 
+                updateDashboardStats();
+                alert(`Sales ${editingSaleDate ? 'updated' : 'saved'} for ${date}! Total: ${UGX(total)}, Profit: ${UGX(profit)}`);
+                editingSaleDate = null;
             });
+
+            document.getElementById('salesHistoryTable').addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-edit-sale]'); if (!btn) return;
+                const date = btn.getAttribute('data-edit-sale');
+                editSale(date);
+            });
+
             document.getElementById('btnFilterSales').addEventListener('click', loadRecentSales);
         }
 
         // ================ PURCHASES ================
         function renderPurchases() { document.getElementById('purchaseQty').value = '1'; document.getElementById('purchaseUnitCost').value = '0'; loadPurchases(); populateProductSelects(); }
+        
         function loadPurchases() {
             const from = document.getElementById('purchaseFrom').value || todayStr(), to = document.getElementById('purchaseTo').value || todayStr();
             let filtered = db.purchases.filter(p => p.date >= from && p.date <= to);
             filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
             const tbody = document.querySelector('#purchasesTable tbody');
             if (tbody) {
-                tbody.innerHTML = filtered.map((p, idx) => `<tr><td>${p.date}</td><td>${p.productName}</td><td>${p.quantity}</td><td>${UGX(p.unitCost)}</td><td>${UGX(p.quantity * p.unitCost)}</td><td class="no-print"><button class="btn bad" data-remove-purchase="${idx}">×</button></td></tr>`).join('');
+                tbody.innerHTML = filtered.map((p) => `<tr>
+                    <td>${p.date}</td>
+                    <td>${p.productName}</td>
+                    <td>${p.quantity}</td>
+                    <td>${UGX(p.unitCost)}</td>
+                    <td>${UGX(p.quantity * p.unitCost)}</td>
+                    <td class="no-print"><button class="btn edit-btn" data-edit-purchase="${p.id}">✎ Edit</button></td>
+                </tr>`).join('');
             }
             const totalCost = filtered.reduce((sum, p) => sum + (p.quantity * p.unitCost), 0);
             document.getElementById('totalPurchases').textContent = UGX(totalCost);
         }
+
+        function editPurchase(id) {
+            const purchase = db.purchases.find(p => p.id === id);
+            if (!purchase) { alert('Purchase not found'); return; }
+            
+            // Show edit modal
+            const html = `
+                <div class="grid-2">
+                    <div><label>Date</label><input type="date" id="editPurchaseDate" value="${purchase.date}"></div>
+                    <div><label>Product</label><select id="editPurchaseProduct"><option value="${purchase.productId}">${purchase.productName}</option></select></div>
+                    <div><label>Quantity</label><input type="number" id="editPurchaseQty" value="${purchase.quantity}" min="1"></div>
+                    <div><label>Unit Cost (UGX)</label><input type="number" id="editPurchaseCost" value="${purchase.unitCost}" min="0"></div>
+                </div>
+            `;
+            
+            openEditModal('Edit Purchase', html, () => {
+                const newDate = document.getElementById('editPurchaseDate').value;
+                const newQty = parseInt(document.getElementById('editPurchaseQty').value) || 1;
+                const newCost = parseInt(document.getElementById('editPurchaseCost').value) || 0;
+                if (newQty <= 0) { alert('Enter valid quantity'); return; }
+                if (newCost <= 0) { alert('Enter valid cost'); return; }
+                
+                // Revert old purchase from stock
+                const product = db.products.find(p => p.id === purchase.productId);
+                if (product) {
+                    product.currentStock = Math.max(0, (product.currentStock || 0) - purchase.quantity);
+                }
+                
+                // Update purchase
+                purchase.date = newDate;
+                purchase.quantity = newQty;
+                purchase.unitCost = newCost;
+                
+                // Apply new purchase to stock
+                if (product) {
+                    product.currentStock = (product.currentStock || 0) + newQty;
+                }
+                
+                recalculateAll();
+                saveData();
+                renderPurchases();
+                renderProducts();
+                renderInventory();
+                updateDashboardStats();
+                closeEditModal();
+                alert('Purchase updated successfully!');
+            });
+        }
+
         function setupPurchases() {
             document.getElementById('btnAddPurchase').addEventListener('click', () => {
                 const pid = document.getElementById('purchaseProduct').value, qty = parseInt(document.getElementById('purchaseQty').value) || 1, unitCost = parseInt(document.getElementById('purchaseUnitCost').value) || 0, date = document.getElementById('purchaseDate').value || todayStr();
                 if (!pid) { alert('Select a product'); return; } if (qty <= 0) { alert('Enter valid quantity'); return; } if (unitCost <= 0) { alert('Enter valid unit cost'); return; }
                 const product = db.products.find(x => x.id === pid); if (!product) { alert('Product not found'); return; }
-                db.purchases.push({ id: 'pur_' + Date.now(), date, productId: pid, productName: product.name, quantity: qty, unitCost, recordedAt: new Date().toISOString() });
+                db.purchases.push({ id: generateId(), date, productId: pid, productName: product.name, quantity: qty, unitCost, recordedAt: new Date().toISOString() });
                 product.currentStock = (product.currentStock || product.openingStock || 0) + qty;
+                recalculateAll();
                 saveData(); renderPurchases(); renderProducts(); renderInventory(); updateDashboardStats();
                 alert(`Purchase added! ${qty} x ${product.name} added.`);
             });
+            
             document.getElementById('purchasesTable').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-remove-purchase]'); if (!btn) return;
-                const idx = parseInt(btn.getAttribute('data-remove-purchase'));
-                const from = document.getElementById('purchaseFrom').value || todayStr(), to = document.getElementById('purchaseTo').value || todayStr();
-                const filtered = db.purchases.filter(p => p.date >= from && p.date <= to);
-                const realPurchase = filtered[idx]; if (!realPurchase) return;
-                if (!confirm(`Delete purchase of ${realPurchase.quantity} x ${realPurchase.productName} on ${realPurchase.date}?`)) return;
-                const realIdx = db.purchases.findIndex(p => p.id === realPurchase.id);
-                if (realIdx > -1) {
-                    const product = db.products.find(p => p.id === realPurchase.productId);
-                    if (product) product.currentStock = Math.max(0, (product.currentStock || 0) - realPurchase.quantity);
-                    db.purchases.splice(realIdx, 1);
-                    saveData(); renderPurchases(); renderProducts(); renderInventory(); updateDashboardStats();
-                    alert('Purchase deleted and stock reverted.');
-                }
+                const btn = e.target.closest('[data-edit-purchase]'); if (!btn) return;
+                const id = btn.getAttribute('data-edit-purchase');
+                editPurchase(id);
             });
+
             document.getElementById('btnFilterPurchases').addEventListener('click', loadPurchases);
         }
 
@@ -1004,28 +1219,61 @@
             const from = document.getElementById('expenseFrom').value || todayStr(), to = document.getElementById('expenseTo').value || todayStr();
             const filtered = db.expenses.filter(e => e.date >= from && e.date <= to).sort((a,b) => new Date(b.date) - new Date(a.date));
             const tbody = document.querySelector('#expensesTable tbody');
-            if (tbody) tbody.innerHTML = filtered.map((e, idx) => `<tr><td>${e.date}</td><td><span class="pill">${e.type}</span></td><td>${e.description||''}</td><td>${UGX(e.amount)}</td><td class="no-print"><button class="btn bad" data-remove-expense="${idx}">×</button></td></tr>`).join('');
+            if (tbody) tbody.innerHTML = filtered.map(e => `<tr>
+                <td>${e.date}</td>
+                <td><span class="pill">${e.type}</span></td>
+                <td>${e.description||''}</td>
+                <td>${UGX(e.amount)}</td>
+                <td class="no-print"><button class="btn edit-btn" data-edit-expense="${e.id}">✎ Edit</button></td>
+            </tr>`).join('');
             const total = filtered.reduce((s, e) => s + (e.amount || 0), 0);
             document.getElementById('totalExpenses').textContent = UGX(total);
         }
+
+        function editExpense(id) {
+            const expense = db.expenses.find(e => e.id === id);
+            if (!expense) { alert('Expense not found'); return; }
+            const html = `
+                <div class="grid-2">
+                    <div><label>Date</label><input type="date" id="editExpenseDate" value="${expense.date}"></div>
+                    <div><label>Type</label><select id="editExpenseType">
+                        <option value="rent" ${expense.type === 'rent' ? 'selected' : ''}>Rent</option>
+                        <option value="utilities" ${expense.type === 'utilities' ? 'selected' : ''}>Utilities</option>
+                        <option value="salaries" ${expense.type === 'salaries' ? 'selected' : ''}>Salaries</option>
+                        <option value="supplies" ${expense.type === 'supplies' ? 'selected' : ''}>Supplies</option>
+                        <option value="maintenance" ${expense.type === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                        <option value="other" ${expense.type === 'other' ? 'selected' : ''}>Other</option>
+                    </select></div>
+                    <div><label>Amount (UGX)</label><input type="number" id="editExpenseAmount" value="${expense.amount}" min="0"></div>
+                    <div style="grid-column:span 2;"><label>Description</label><textarea id="editExpenseDesc" rows="2">${expense.description || ''}</textarea></div>
+                </div>
+            `;
+            openEditModal('Edit Expense', html, () => {
+                expense.date = document.getElementById('editExpenseDate').value;
+                expense.type = document.getElementById('editExpenseType').value;
+                expense.amount = parseInt(document.getElementById('editExpenseAmount').value) || 0;
+                expense.description = document.getElementById('editExpenseDesc').value.trim();
+                if (expense.amount <= 0) { alert('Enter valid amount'); return; }
+                saveData();
+                renderExpenses();
+                updateDashboardStats();
+                closeEditModal();
+                alert('Expense updated successfully!');
+            });
+        }
+
         function setupExpenses() {
             document.getElementById('btnSaveExpense').addEventListener('click', () => {
                 const date = document.getElementById('expenseDate').value || todayStr(), type = document.getElementById('expenseType').value;
                 const desc = document.getElementById('expenseDescription').value.trim(), amt = parseInt(document.getElementById('expenseAmount').value) || 0;
                 if (!desc) { alert('Enter description'); return; } if (amt <= 0) { alert('Enter valid amount'); return; }
-                db.expenses.push({ id: 'exp_' + Date.now(), date, type, description: desc, amount: amt, recordedAt: new Date().toISOString() });
+                db.expenses.push({ id: generateId(), date, type, description: desc, amount: amt, recordedAt: new Date().toISOString() });
                 saveData(); renderExpenses(); updateDashboardStats(); alert('Expense saved!');
             });
             document.getElementById('expensesTable').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-remove-expense]'); if (!btn) return;
-                const idx = parseInt(btn.getAttribute('data-remove-expense'));
-                if (confirm('Delete this expense?')) {
-                    const from = document.getElementById('expenseFrom').value || todayStr(), to = document.getElementById('expenseTo').value || todayStr();
-                    const filtered = db.expenses.filter(e => e.date >= from && e.date <= to);
-                    const realIdx = db.expenses.indexOf(filtered[idx]);
-                    if (realIdx > -1) db.expenses.splice(realIdx, 1);
-                    saveData(); renderExpenses(); updateDashboardStats();
-                }
+                const btn = e.target.closest('[data-edit-expense]'); if (!btn) return;
+                const id = btn.getAttribute('data-edit-expense');
+                editExpense(id);
             });
             document.getElementById('btnFilterExpenses').addEventListener('click', loadExpenses);
         }
@@ -1043,7 +1291,7 @@
 
             const tbody = document.querySelector('#debtsTable tbody');
             if (tbody) {
-                tbody.innerHTML = filtered.map((d, idx) => {
+                tbody.innerHTML = filtered.map(d => {
                     const balance = d.amount - d.paidAmount;
                     const statusClass = d.status === 'paid' ? 'paid' : d.status === 'partial' ? 'partial' : 'unpaid';
                     const statusLabel = d.status === 'paid' ? '✅ Paid' : d.status === 'partial' ? '⚠️ Partial' : '❌ Unpaid';
@@ -1056,24 +1304,55 @@
                         <td><span class="pill ${statusClass}">${statusLabel}</span></td>
                         <td>${d.dueDate || '-'}</td>
                         <td class="no-print">
-                            ${d.status !== 'paid' ? `<button class="btn ok" data-pay-debt="${idx}">Pay</button>` : ''}
-                            <button class="btn bad" data-remove-debt="${idx}">×</button>
+                            ${d.status !== 'paid' ? `<button class="btn ok" data-pay-debt="${d.id}">Pay</button>` : ''}
+                            <button class="btn edit-btn" data-edit-debt="${d.id}">✎ Edit</button>
                         </td>
                     </tr>`;
                 }).join('');
             }
 
-            // Update debt payment dropdown
             const select = document.getElementById('debtPaymentSelect');
             const unpaid = db.debts.filter(d => d.status !== 'paid');
             select.innerHTML = '<option value="">Select debt to pay</option>' + unpaid.map(d => 
                 `<option value="${d.id}">${d.customer} - ${UGX(d.amount - d.paidAmount)} (${d.date})</option>`
             ).join('');
 
-            // Total outstanding
             let outstanding = 0;
             db.debts.forEach(d => { if (d.status !== 'paid') outstanding += (d.amount - d.paidAmount); });
             document.getElementById('totalOutstanding').textContent = UGX(outstanding);
+        }
+
+        function editDebt(id) {
+            const debt = db.debts.find(d => d.id === id);
+            if (!debt) { alert('Debt not found'); return; }
+            const html = `
+                <div class="grid-2">
+                    <div><label>Date</label><input type="date" id="editDebtDate" value="${debt.date}"></div>
+                    <div><label>Customer</label><input type="text" id="editDebtCustomer" value="${debt.customer}"></div>
+                    <div><label>Amount (UGX)</label><input type="number" id="editDebtAmount" value="${debt.amount}" min="0"></div>
+                    <div><label>Paid Amount (UGX)</label><input type="number" id="editDebtPaid" value="${debt.paidAmount}" min="0"></div>
+                    <div><label>Due Date</label><input type="date" id="editDebtDue" value="${debt.dueDate || ''}"></div>
+                    <div style="grid-column:span 2;"><label>Description</label><textarea id="editDebtDesc" rows="2">${debt.description || ''}</textarea></div>
+                </div>
+            `;
+            openEditModal('Edit Debt', html, () => {
+                debt.date = document.getElementById('editDebtDate').value;
+                debt.customer = document.getElementById('editDebtCustomer').value.trim();
+                debt.amount = parseInt(document.getElementById('editDebtAmount').value) || 0;
+                debt.paidAmount = parseInt(document.getElementById('editDebtPaid').value) || 0;
+                debt.dueDate = document.getElementById('editDebtDue').value;
+                debt.description = document.getElementById('editDebtDesc').value.trim();
+                if (!debt.customer) { alert('Enter customer name'); return; }
+                if (debt.amount <= 0) { alert('Enter valid amount'); return; }
+                if (debt.paidAmount >= debt.amount) debt.status = 'paid';
+                else if (debt.paidAmount > 0) debt.status = 'partial';
+                else debt.status = 'unpaid';
+                saveData();
+                renderDebts();
+                updateDashboardStats();
+                closeEditModal();
+                alert('Debt updated successfully!');
+            });
         }
 
         function setupDebts() {
@@ -1086,7 +1365,7 @@
                 if (!customer) { alert('Enter customer name'); return; }
                 if (amount <= 0) { alert('Enter valid amount'); return; }
                 db.debts.push({
-                    id: 'debt_' + Date.now(),
+                    id: generateId(),
                     date, customer, amount, paidAmount: 0,
                     dueDate, description, status: 'unpaid',
                     recordedAt: new Date().toISOString()
@@ -1119,35 +1398,23 @@
             document.getElementById('debtsTable').addEventListener('click', (e) => {
                 const payBtn = e.target.closest('[data-pay-debt]');
                 if (payBtn) {
-                    const idx = parseInt(payBtn.getAttribute('data-pay-debt'));
-                    const from = document.getElementById('debtFrom').value || todayStr();
-                    const to = document.getElementById('debtTo').value || todayStr();
-                    const filtered = db.debts.filter(d => d.date >= from && d.date <= to);
-                    const debt = filtered[idx];
+                    const id = payBtn.getAttribute('data-pay-debt');
+                    const debt = db.debts.find(d => d.id === id);
                     if (!debt) return;
                     const payment = parseInt(prompt(`Enter payment for ${debt.customer} (Balance: ${UGX(debt.amount - debt.paidAmount)}):`)) || 0;
                     if (payment <= 0) return;
                     const balance = debt.amount - debt.paidAmount;
-                    const realDebt = db.debts.find(d => d.id === debt.id);
-                    if (realDebt) {
-                        realDebt.paidAmount += Math.min(payment, balance);
-                        if (realDebt.paidAmount >= realDebt.amount) realDebt.status = 'paid';
-                        else if (realDebt.paidAmount > 0) realDebt.status = 'partial';
-                        saveData(); renderDebts(); updateDashboardStats();
-                        alert('Payment recorded!');
-                    }
+                    debt.paidAmount += Math.min(payment, balance);
+                    if (debt.paidAmount >= debt.amount) debt.status = 'paid';
+                    else if (debt.paidAmount > 0) debt.status = 'partial';
+                    saveData(); renderDebts(); updateDashboardStats();
+                    alert('Payment recorded!');
                     return;
                 }
-                const btn = e.target.closest('[data-remove-debt]');
-                if (!btn) return;
-                if (confirm('Delete this debt record?')) {
-                    const idx = parseInt(btn.getAttribute('data-remove-debt'));
-                    const from = document.getElementById('debtFrom').value || todayStr();
-                    const to = document.getElementById('debtTo').value || todayStr();
-                    const filtered = db.debts.filter(d => d.date >= from && d.date <= to);
-                    const realIdx = db.debts.indexOf(filtered[idx]);
-                    if (realIdx > -1) db.debts.splice(realIdx, 1);
-                    saveData(); renderDebts(); updateDashboardStats();
+                const editBtn = e.target.closest('[data-edit-debt]');
+                if (editBtn) {
+                    const id = editBtn.getAttribute('data-edit-debt');
+                    editDebt(id);
                 }
             });
 
@@ -1240,14 +1507,6 @@
                 if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
                 const data = JSON.stringify(db, null, 2);
                 const blob = new Blob([data], { type: 'application/json' });
-                const file = new File([blob], `orji-backup-${todayStr()}.json`, { type: 'application/json' });
-                const formData = new FormData();
-                formData.append('to', email);
-                formData.append('subject', `Orji Supplies Backup - ${todayStr()}`);
-                formData.append('body', `Orji Supplies Management System Backup\nDate: ${new Date().toLocaleString()}\nProducts: ${db.products.length}\nSales Records: ${Object.keys(db.dailySheets).length}\nPurchases: ${db.purchases.length}\nExpenses: ${db.expenses.length}\nDebts: ${db.debts.length}\n\nAttached is the complete backup file.`);
-                formData.append('file', file);
-                // Use a free email sending service (this is a demo - in production use a proper backend)
-                // For demo, we'll download the file and show instructions
                 download(`orji-backup-${todayStr()}.json`, blob);
                 alert(`Backup file downloaded. Please email it to ${email} manually.\n\nIn production, this would send automatically via a backend service.`);
                 document.getElementById('emailStatus').textContent = `✅ Backup downloaded for ${email}`;
@@ -1261,6 +1520,7 @@
                         const data = JSON.parse(ev.target.result);
                         if (confirm('Restore this data from email backup? Current data will be replaced.')) {
                             db = data;
+                            recalculateAll();
                             saveData();
                             document.getElementById('emailStatus').textContent = `✅ Restored from ${file.name}`;
                             location.reload();
@@ -1280,17 +1540,16 @@
             document.getElementById('restoreFile').addEventListener('change', function(e) {
                 const file = e.target.files[0]; if (!file) return;
                 const reader = new FileReader();
-                reader.onload = function(ev) { try { const nd = JSON.parse(ev.target.result); if (confirm('Restore this data? Current data will be replaced.')) { db = nd; saveData(); location.reload(); } } catch (err) { alert('Error restoring: ' + err.message); } };
+                reader.onload = function(ev) { try { const nd = JSON.parse(ev.target.result); if (confirm('Restore this data? Current data will be replaced.')) { db = nd; recalculateAll(); saveData(); location.reload(); } } catch (err) { alert('Error restoring: ' + err.message); } };
                 reader.readAsText(file); this.value = '';
             });
 
-            // Danger zone
             document.getElementById('btnWipe').addEventListener('click', () => { if (confirm('ARE YOU SURE? This deletes ALL data and cannot be undone!')) { localStorage.removeItem(STORAGE_KEY); location.reload(); } });
-            document.getElementById('btnClearSheets').addEventListener('click', () => { if (confirm('Clear all sales records? Cannot be undone!')) { db.dailySheets = {}; saveData(); renderSales(); renderProducts(); updateDashboardStats(); alert('Sales records cleared!'); } });
+            document.getElementById('btnClearSheets').addEventListener('click', () => { if (confirm('Clear all sales records? Cannot be undone!')) { db.dailySheets = {}; recalculateAll(); saveData(); renderSales(); renderProducts(); updateDashboardStats(); alert('Sales records cleared!'); } });
             document.getElementById('btnClearPurchases').addEventListener('click', () => {
                 if (confirm('Clear all purchase records? This will also reset stock levels to opening stock. Cannot be undone!')) {
-                    db.products.forEach(p => { p.currentStock = p.openingStock || 0; });
                     db.purchases = [];
+                    recalculateAll();
                     saveData(); renderPurchases(); renderProducts(); renderInventory(); updateDashboardStats();
                     alert('Purchases cleared and stock reset to opening levels.');
                 }
@@ -1394,7 +1653,7 @@
                 if (!confirm(`Load backup from ${new Date(existing.modifiedTime).toLocaleString()}?`)) return;
                 const jsonText = await driveDownloadFile(existing.id); const backupData = JSON.parse(jsonText);
                 if (confirm("This will replace ALL current data. Continue?")) {
-                    db = backupData; saveData();
+                    db = backupData; recalculateAll(); saveData();
                     const btn = document.getElementById('btnCloudLoad'), orig = btn.textContent;
                     btn.textContent = "✓ Loaded!"; btn.disabled = true;
                     setTimeout(() => { btn.textContent = orig; btn.disabled = false; location.reload(); }, 1000);
@@ -1438,6 +1697,9 @@
             initBackground();
             setAllDates();
 
+            // Ensure all data is consistent
+            recalculateAll();
+
             setupTabs();
             setupProducts();
             setupSales();
@@ -1461,7 +1723,7 @@
             document.getElementById('periodStart').addEventListener('change', updateDashboardStats);
             document.getElementById('periodEnd').addEventListener('change', updateDashboardStats);
 
-            console.log('Orji Supplies Enhanced Management System initialized.');
+            console.log('Orji Supplies Enhanced Management System with Full Edit Support initialized.');
             console.log(`Products: ${db.products.length}, Purchases: ${db.purchases.length}, Sales: ${Object.keys(db.dailySheets).length}, Expenses: ${db.expenses.length}, Debts: ${db.debts.length}`);
         }
 
