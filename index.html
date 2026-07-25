@@ -3,12 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Orji Supplies - Management System</title>
-    <meta name="description" content="Fully functional stock management system for Orji Supplies with manual purchases">
+    <title>Orji Supplies - Enhanced Management System</title>
+    <meta name="description" content="Fully functional stock management system with variable pricing, debt tracking, and email backup">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer>
-    </script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --brand: #0ea5e9;
@@ -21,8 +20,15 @@
             --line: #e2e8f0;
             --bg: #f8fafc;
         }
-
-        /* Background Styles */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Inter, system-ui, -apple-system, sans-serif;
+            color: var(--ink);
+            line-height: 1.5;
+            background: var(--bg);
+            position: relative;
+            min-height: 100vh;
+        }
         .background-container {
             position: fixed;
             top: 0;
@@ -55,15 +61,6 @@
             background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 100%);
             z-index: 1;
         }
-
-        body {
-            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-            color: var(--ink);
-            line-height: 1.5;
-            position: relative;
-            background: var(--ink);
-        }
-
         .card, .stat, .modal-content, header, .table {
             background: rgba(255,255,255,0.95) !important;
             backdrop-filter: blur(10px);
@@ -75,64 +72,10 @@
             backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 30px rgba(0,0,0,0.1);
-        }
-        .table th { background: rgba(248,250,252,0.95) !important; }
-        .table tr:hover td { background: rgba(248,250,252,0.8) !important; }
-
-        h1,h2,h3,h4,h5,h6,.brand,.stat b {
-            color: #111827;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
-        }
-        .muted {
-            color: #4b5563;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.3);
-        }
-        .btn { backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); }
-
-        .background-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            padding: 10px 15px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        .bg-btn {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--line);
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .bg-btn.active { background: var(--brand); transform: scale(1.2); border-color: white; }
-        .bg-pause {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--muted);
-            padding: 0 5px;
-        }
-        .bg-pause:hover { color: var(--brand); }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html,body { height: 100%; }
-        header {
             position: sticky;
             top: 0;
             z-index: 20;
-            border-bottom: 1px solid var(--line);
             padding: 0 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .nav {
             display: flex;
@@ -142,6 +85,7 @@
             padding: 12px 0;
             max-width: 1400px;
             margin: 0 auto;
+            flex-wrap: wrap;
         }
         .brand { display: flex; gap: 10px; align-items: center; font-weight: 800; font-size: 18px; }
         .brand-badge {
@@ -157,6 +101,7 @@
             font-weight: 600;
             font-size: 14px;
             transition: all 0.2s;
+            background: transparent;
         }
         .tab:hover { background: rgba(241,245,249,0.7); }
         .tab.active { background: var(--brand); border-color: var(--brand); color: #fff; }
@@ -174,18 +119,19 @@
         .row { display: grid; grid-template-columns: repeat(12,1fr); gap: 16px; }
         .card { border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
         label { font-size: 14px; color: var(--muted); display: block; margin-bottom: 6px; font-weight: 600; }
-        input,select,button,textarea { font-family: inherit; font-size: 14px; }
-        input[type="number"],input[type="date"],input[type="text"],select,textarea {
+        input, select, button, textarea { font-family: inherit; font-size: 14px; }
+        input[type="number"], input[type="date"], input[type="text"], select, textarea {
             width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
             background: #fff; transition: border 0.2s;
         }
-        input:focus,select:focus,textarea:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
         }
         .btn {
             padding: 10px 16px; border-radius: 8px; border: 1px solid var(--line);
             cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s;
             display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            background: #fff;
         }
         .btn:hover { background: rgba(248,250,252,0.8); }
         .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
@@ -193,6 +139,9 @@
         .btn.ok { background: var(--ok); border-color: var(--ok); color: #fff; }
         .btn.ok:hover { background: #15803d; }
         .btn.bad { background: var(--bad); border-color: var(--bad); color: #fff; }
+        .btn.bad:hover { background: #dc2626; }
+        .btn.warn { background: var(--warn); border-color: var(--warn); color: #fff; }
+        .btn.warn:hover { background: #d97706; }
         .stack { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
         .pill {
             display: inline-block; padding: 4px 10px; border-radius: 999px;
@@ -200,7 +149,9 @@
             background: #e5e7eb; color: #1f2937;
         }
         .pill.category-pill { /* background set by JS */ }
-
+        .pill.paid { background: var(--ok); color: white; border-color: var(--ok); }
+        .pill.unpaid { background: var(--bad); color: white; border-color: var(--bad); }
+        .pill.partial { background: var(--warn); color: white; border-color: var(--warn); }
         .table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .table th {
             border-bottom: 2px solid var(--line); padding: 12px; text-align: left;
@@ -208,7 +159,7 @@
         }
         .table td { border-bottom: 1px solid var(--line); padding: 12px; font-size: 14px; }
         .help { font-size: 12px; color: var(--muted); margin-top: 8px; }
-        .right { display: flex; justify-content: flex-end; gap: 12px; }
+        .right { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
         .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
@@ -219,7 +170,7 @@
         .goodmsg { background: #ecfdf5; border: 1px solid #86efac; color: #065f46; padding: 12px; border-radius: 10px; margin: 12px 0; }
         .badmsg { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 12px; border-radius: 10px; margin: 12px 0; }
         .section-tools { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-        .compact-table th,.compact-table td { padding: 8px 10px; font-size: 13px; }
+        .compact-table th, .compact-table td { padding: 8px 10px; font-size: 13px; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
         .modal-content { padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -232,52 +183,65 @@
         .data-row:last-child { border-bottom: none; }
         .category-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; background: var(--brand); color: white; }
         .highlight { background: #fef3c7; border-left: 3px solid #f59e0b; }
+        .low-stock { background: #fee2e2; border-left: 3px solid #ef4444; }
         .profit-positive { color: var(--ok); font-weight: 600; }
         .profit-negative { color: var(--bad); font-weight: 600; }
-
-        @media print {
-            .background-container,.background-controls,.no-print,header,.btn,input,select,textarea,.tabs,.modal,.loading { display: none !important; }
-            body,main,section,.card,.tabpanel { position: static !important; background: white !important; color: black !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: auto !important; overflow: visible !important; }
-            .card,.stat,.table { background: white !important; box-shadow: none !important; border: 1px solid #000 !important; break-inside: avoid; }
-            table,tbody,thead,tr,td,th { display: table !important; width: 100% !important; }
-            [style*="max-height"],[style*="overflow"] { max-height: none !important; overflow: visible !important; height: auto !important; }
-            tr { break-inside: avoid; page-break-inside: avoid; }
-            .print-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-            .stat { page-break-inside: avoid; border: 1px solid #000; margin: 10px 0; }
-            .hr { border-top: 1px solid #000; margin: 15px 0; }
-            .table { border: 1px solid #000; page-break-inside: auto; }
-            .table th { background: #f0f0f0 !important; color: #000 !important; font-weight: bold; border-bottom: 2px solid #000; }
-            .table td { border-bottom: 1px solid #ccc; }
-            .pill { border: 1px solid #000; background: #f0f0f0 !important; color: #000 !important; }
-            * { color: #000 !important; text-shadow: none !important; }
-            .page-break { page-break-before: always; }
-            .print-section { width: 100%; margin: 0; padding: 10px; }
-            @media print and (-webkit-min-device-pixel-ratio:0) { body { -webkit-print-color-adjust: exact; } }
+        .status-paid { color: var(--ok); font-weight: 600; }
+        .status-unpaid { color: var(--bad); font-weight: 600; }
+        .status-partial { color: var(--warn); font-weight: 600; }
+        .email-section { background: rgba(255,255,255,0.9); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-top: 12px; }
+        .email-section input { width: auto; flex: 1; min-width: 200px; }
+        .background-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
         }
-        .print-only { display: none; }
-        @media print { .print-only { display: block !important; } }
-
+        .bg-btn {
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--line); border: 2px solid transparent;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .bg-btn.active { background: var(--brand); transform: scale(1.2); border-color: white; }
+        .bg-pause { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); padding: 0 5px; }
+        .bg-pause:hover { color: var(--brand); }
         @media (max-width: 1200px) { .grid-4 { grid-template-columns: repeat(2,1fr); } }
         @media (max-width: 768px) {
-            .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
             .row { grid-template-columns: 1fr; }
             .card { padding: 16px; }
             .nav { flex-direction: column; gap: 16px; }
             .tabs { width: 100%; justify-content: center; }
             .background-controls { bottom: 10px; right: 10px; padding: 8px 12px; }
         }
+        .print-only { display: none; }
+        @media print {
+            .background-container, .background-controls, .no-print, header, .btn, input, select, textarea, .tabs, .modal, .loading { display: none !important; }
+            body, main, section, .card, .tabpanel { position: static !important; background: white !important; color: black !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: auto !important; overflow: visible !important; }
+            .card, .stat, .table { background: white !important; box-shadow: none !important; border: 1px solid #000 !important; break-inside: avoid; }
+            table, tbody, thead, tr, td, th { display: table !important; width: 100% !important; }
+            tr { break-inside: avoid; page-break-inside: avoid; }
+            .print-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+            .print-only { display: block !important; }
+        }
     </style>
 </head>
 <body>
-    <!-- Background Container -->
     <div class="background-container no-print">
         <div class="background-slide active" id="bg-slide-1"></div>
         <div class="background-slide" id="bg-slide-2"></div>
         <div class="background-slide" id="bg-slide-3"></div>
         <div class="background-overlay"></div>
     </div>
-
-    <!-- Background Controls -->
     <div class="background-controls no-print">
         <div class="bg-btn active" data-bg="1" title="Background 1"></div>
         <div class="bg-btn" data-bg="2" title="Background 2"></div>
@@ -294,6 +258,7 @@
                 <button class="tab" data-tab="sales">Sales</button>
                 <button class="tab" data-tab="purchases">Purchases</button>
                 <button class="tab" data-tab="expenses">Expenses</button>
+                <button class="tab" data-tab="debts">Debts</button>
                 <button class="tab" data-tab="reports">Reports</button>
                 <button class="tab" data-tab="products">Products</button>
                 <button class="tab" data-tab="data">Data</button>
@@ -311,38 +276,24 @@
                 <div class="stat"><span class="muted">Total Purchases</span><b id="statMonthPurchases">UGX 0</b></div>
                 <div class="stat"><span class="muted">Most Moving Category</span><b id="statMostMoving">-</b></div>
             </div>
-
-            <div class="hr"></div>
-
-            <div class="grid-3">
-                <div class="stat">
-                    <span class="muted">Gross Profit (Period)</span>
-                    <b id="statGrossProfit">UGX 0</b>
-                </div>
-                <div class="stat">
-                    <span class="muted">Total Expenses</span>
-                    <b id="statTotalExpenses">UGX 0</b>
-                </div>
-                <div class="stat">
-                    <span class="muted">Net Profit/Loss</span>
-                    <b id="statNetProfit">UGX 0</b>
-                </div>
+            <div class="grid-3" style="margin-top:16px;">
+                <div class="stat"><span class="muted">Outstanding Debts</span><b id="statOutstandingDebts" style="color:var(--bad);">UGX 0</b></div>
+                <div class="stat"><span class="muted">Total Expenses</span><b id="statTotalExpenses">UGX 0</b></div>
+                <div class="stat"><span class="muted">Net Profit/Loss</span><b id="statNetProfit">UGX 0</b></div>
             </div>
-
             <div class="hr"></div>
-
             <div class="row">
                 <div class="card" style="grid-column:span 6;">
-                    <h3>Top Selling Products</h3>
-                    <div id="topProductsList"></div>
+                    <h3>Low Stock Alerts (≤ 20 units)</h3>
+                    <div id="lowStockAlerts"></div>
                 </div>
                 <div class="card" style="grid-column:span 6;">
                     <h3>Profitability Status</h3>
                     <div id="profitStatus" class="goodmsg"><strong>Status:</strong> Calculating profitability...</div>
                     <div class="hr"></div>
                     <div class="grid-2">
-                        <div><span class="muted">Period Start</span><input type="date" id="periodStart" value="2026-01-10" class="no-print"></div>
-                        <div><span class="muted">Period End</span><input type="date" id="periodEnd" value="2026-01-10" class="no-print"></div>
+                        <div><span class="muted">Period Start</span><input type="date" id="periodStart" class="no-print"></div>
+                        <div><span class="muted">Period End</span><input type="date" id="periodEnd" class="no-print"></div>
                     </div>
                 </div>
             </div>
@@ -351,25 +302,24 @@
         <!-- Inventory -->
         <section id="inventory" class="tabpanel" style="display:none;">
             <div class="card">
-                <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Inventory Report</h3><p>Date: <span id="printInventoryDate">2026-01-10</span> | Generated: <span id="printInventoryGenerated"></span></p><div class="hr"></div></div>
+                <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Inventory Report</h3><p>Date: <span id="printInventoryDate"></span></p><div class="hr"></div></div>
                 <div class="section-tools no-print">
                     <h3 style="margin-right:auto">Inventory Management</h3>
                     <button class="btn" id="btnPrintInventory">Print</button>
                     <button class="btn" id="btnExportInventory">Export CSV</button>
                 </div>
                 <div class="grid-3 no-print">
-                    <div><label>Stock Date</label><input type="date" id="inventoryDate" value="2026-01-10"></div>
+                    <div><label>Stock Date</label><input type="date" id="inventoryDate"></div>
                     <div><label>Filter Category</label><select id="filterCategory"><option value="">All Categories</option></select></div>
                     <div class="right"><button class="btn primary" id="btnUpdateInventory">Update</button></div>
                 </div>
                 <div class="hr no-print"></div>
                 <div style="overflow-x:auto;">
                     <table class="table" id="inventoryTable">
-                        <thead><tr><th>Product</th><th>Category</th><th>Opening</th><th>Purchased</th><th>Sold</th><th>Closing</th><th>Cost Price</th><th>Sale Price</th><th>Stock Value</th><th>Profit</th></tr></thead>
+                        <thead><tr><th>Product</th><th>Category</th><th>Opening</th><th>Purchased</th><th>Sold</th><th>Closing</th><th>Cost Price</th><th>Sale Price</th><th>Stock Value</th><th>Profit</th><th>Status</th></tr></thead>
                         <tbody></tbody>
                     </table>
                 </div>
-                <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><p>End of Inventory Report</p></div>
             </div>
         </section>
 
@@ -380,51 +330,36 @@
                     <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Sales Entry Form</h3><div class="hr"></div></div>
                     <h3>Record Sales</h3>
                     <div class="grid-3 no-print">
-                        <div><label>Date</label><input type="date" id="saleDate" value="2026-01-10"></div>
+                        <div><label>Date</label><input type="date" id="saleDate"></div>
                         <div><label>Reference</label><input type="text" id="sheetReference" placeholder="e.g., Invoice #"></div>
-                        <div><label>Record Type</label><select id="recordType"><option value="manual">Manual Entry</option></select></div>
+                        <div><label>Customer</label><input type="text" id="customerName" placeholder="Customer name (optional)"></div>
                     </div>
                     <div class="hr"></div>
                     <h4>Sales Items</h4>
                     <div class="grid-4 no-print" style="margin-bottom:12px;">
                         <div><label>Product</label><select id="saleProduct"></select></div>
-                        <div><label>Quantity Sold</label><input type="number" id="saleQty" min="1" value="1"></div>
-                        <div><label>Unit Price (UGX)</label><input type="number" id="salePrice" min="0" value="0"></div>
+                        <div><label>Quantity</label><input type="number" id="saleQty" min="1" value="1"></div>
+                        <div><label>Selling Price (UGX)</label><input type="number" id="salePrice" min="0" value="0" placeholder="Enter price"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnAddSaleItem">Add Item</button></div>
                     </div>
-                    <div><table class="table compact-table" id="saleItemsTable"><thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Profit</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
+                    <div><table class="table compact-table" id="saleItemsTable"><thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Profit/Loss</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
                     <div class="right no-print" style="margin-top:16px;">
                         <div class="stat"><span class="muted">Total Sales</span><b id="saleTotal">UGX 0</b></div>
-                        <div class="stat"><span class="muted">Total Profit</span><b id="saleProfit">UGX 0</b></div>
+                        <div class="stat"><span class="muted">Total Profit/Loss</span><b id="saleProfit">UGX 0</b></div>
                         <button class="btn ok" id="btnSaveDailySales">Save Sales</button>
                     </div>
-                    <div class="print-only" style="margin-top:20px;text-align:center;"><div class="hr"></div><p><strong>Note:</strong> This is a sales entry form. Saved records appear in the Recent Sales section.</p></div>
                 </div>
 
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Sales Report</h3><p>Period: <span id="printSalesPeriod"></span> | Generated: <span id="printSalesGenerated"></span></p><div class="hr"></div></div>
+                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Sales Report</h3><p>Period: <span id="printSalesPeriod"></span></p><div class="hr"></div></div>
                     <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Sales</h3><button class="btn" id="btnPrintSalesHistory">Print</button></div>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
-                        <div><label>From Date</label><input type="date" id="saleFrom" value="2026-01-10"></div>
-                        <div><label>To Date</label><input type="date" id="saleTo" value="2026-01-10"></div>
+                        <div><label>From Date</label><input type="date" id="saleFrom"></div>
+                        <div><label>To Date</label><input type="date" id="saleTo"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterSales">Filter</button></div>
                     </div>
-                    <div><table class="table compact-table" id="salesHistoryTable"><thead><tr><th>Date</th><th>Items Sold</th><th>Total Sales</th><th>Total Profit</th><th>Source</th></tr></thead><tbody></tbody></table></div>
-                    <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>End of Sales Report</p></div>
+                    <div><table class="table compact-table" id="salesHistoryTable"><thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total Sales</th><th>Profit/Loss</th></tr></thead><tbody></tbody></table></div>
                 </div>
-            </div>
-
-            <div class="hr"></div>
-            <div class="card">
-                <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Product Sales History</h3><p>Product: <span id="printProductName"></span> | Period: <span id="printProductPeriod"></span></p><div class="hr"></div></div>
-                <div class="section-tools no-print"><h3 style="margin-right:auto">Product Sales History</h3><button class="btn" id="btnPrintProductHistory">Print</button></div>
-                <div class="grid-3 no-print" style="margin-bottom:16px;">
-                    <div><label>Product</label><select id="productHistorySelect"></select></div>
-                    <div><label>From Date</label><input type="date" id="productHistoryFrom" value="2026-01-10"></div>
-                    <div><label>To Date</label><input type="date" id="productHistoryTo" value="2026-01-10"></div>
-                </div>
-                <div><table class="table compact-table" id="productHistoryTable"><thead><tr><th>Date</th><th>Quantity Sold</th><th>Total Sales</th><th>Total Profit</th><th>Avg Price</th></tr></thead><tbody></tbody></table></div>
-                <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>End of Product Sales History Report</p></div>
             </div>
         </section>
 
@@ -435,7 +370,7 @@
                     <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Purchase Entry Form</h3><div class="hr"></div></div>
                     <h3>Record Purchase</h3>
                     <div class="grid-3 no-print">
-                        <div><label>Date</label><input type="date" id="purchaseDate" value="2026-01-10"></div>
+                        <div><label>Date</label><input type="date" id="purchaseDate"></div>
                         <div><label>Product</label><select id="purchaseProduct"></select></div>
                         <div><label>Quantity</label><input type="number" id="purchaseQty" min="1" value="1"></div>
                     </div>
@@ -443,20 +378,18 @@
                         <div><label>Unit Cost (UGX)</label><input type="number" id="purchaseUnitCost" min="0" value="0"></div>
                         <div style="align-self:flex-end;"><button class="btn primary" id="btnAddPurchase">Add Purchase</button></div>
                     </div>
-                    <div class="print-only" style="margin-top:20px;text-align:center;"><div class="hr"></div><p>This is a purchase entry form. Saved purchases appear in the Recent Purchases section.</p></div>
                 </div>
 
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Purchase History</h3><p>Period: <span id="printPurchasePeriod"></span> | Generated: <span id="printPurchaseGenerated"></span></p><div class="hr"></div></div>
+                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Purchase History</h3><p>Period: <span id="printPurchasePeriod"></span></p><div class="hr"></div></div>
                     <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Purchases</h3><button class="btn" id="btnPrintPurchases">Print</button></div>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
-                        <div><label>From Date</label><input type="date" id="purchaseFrom" value="2026-01-10"></div>
-                        <div><label>To Date</label><input type="date" id="purchaseTo" value="2026-01-10"></div>
+                        <div><label>From Date</label><input type="date" id="purchaseFrom"></div>
+                        <div><label>To Date</label><input type="date" id="purchaseTo"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterPurchases">Filter</button></div>
                     </div>
                     <div><table class="table compact-table" id="purchasesTable"><thead><tr><th>Date</th><th>Product</th><th>Qty</th><th>Unit Cost</th><th>Total Cost</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
                     <div class="right" style="margin-top:16px;"><div class="stat"><span class="muted">Total Purchase Cost</span><b id="totalPurchases">UGX 0</b></div></div>
-                    <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>End of Purchase History</p></div>
                 </div>
             </div>
         </section>
@@ -468,26 +401,65 @@
                     <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Expense Entry Form</h3><div class="hr"></div></div>
                     <h3>Record Expense</h3>
                     <div class="grid-3">
-                        <div><label>Date</label><input type="date" id="expenseDate" value="2026-01-10" class="no-print"><span class="print-only">Date: <span id="printExpenseFormDate">2026-01-10</span></span></div>
-                        <div><label>Expense Type</label><select id="expenseType" class="no-print"><option value="rent">Rent</option><option value="utilities">Utilities</option><option value="salaries">Salaries</option><option value="supplies">Supplies</option><option value="maintenance">Maintenance</option><option value="other">Other</option></select><span class="print-only">Type: <span id="printExpenseFormType">Rent</span></span></div>
-                        <div><label>Amount (UGX)</label><input type="number" id="expenseAmount" min="0" value="0" class="no-print"><span class="print-only">Amount: <span id="printExpenseFormAmount">UGX 0</span></span></div>
+                        <div><label>Date</label><input type="date" id="expenseDate" class="no-print"></div>
+                        <div><label>Expense Type</label><select id="expenseType" class="no-print"><option value="rent">Rent</option><option value="utilities">Utilities</option><option value="salaries">Salaries</option><option value="supplies">Supplies</option><option value="maintenance">Maintenance</option><option value="other">Other</option></select></div>
+                        <div><label>Amount (UGX)</label><input type="number" id="expenseAmount" min="0" value="0" class="no-print"></div>
                     </div>
-                    <div><label>Description</label><textarea id="expenseDescription" rows="3" placeholder="Enter expense details..." class="no-print"></textarea><div class="print-only"><strong>Description:</strong> <span id="printExpenseFormDescription">No description provided</span></div></div>
+                    <div><label>Description</label><textarea id="expenseDescription" rows="3" placeholder="Enter expense details..." class="no-print"></textarea></div>
                     <div class="right no-print" style="margin-top:16px;"><button class="btn primary" id="btnSaveExpense">Save Expense</button></div>
-                    <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>This is an expense entry form. Saved expenses appear in the Recent Expenses section.</p></div>
                 </div>
 
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Expenses Report</h3><p>Period: <span id="printExpensesPeriod"></span> | Generated: <span id="printExpensesGenerated"></span></p><div class="hr"></div></div>
+                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Expenses Report</h3><p>Period: <span id="printExpensesPeriod"></span></p><div class="hr"></div></div>
                     <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Expenses</h3><button class="btn" id="btnPrintExpenses">Print</button></div>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
-                        <div><label>From Date</label><input type="date" id="expenseFrom" value="2026-01-10"></div>
-                        <div><label>To Date</label><input type="date" id="expenseTo" value="2026-01-10"></div>
+                        <div><label>From Date</label><input type="date" id="expenseFrom"></div>
+                        <div><label>To Date</label><input type="date" id="expenseTo"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterExpenses">Filter</button></div>
                     </div>
                     <div><table class="table compact-table" id="expensesTable"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
                     <div class="right" style="margin-top:16px;"><div class="stat"><span class="muted">Total Expenses</span><b id="totalExpenses">UGX 0</b></div></div>
-                    <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>End of Expenses Report</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Debts -->
+        <section id="debts" class="tabpanel" style="display:none;">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Debt Entry Form</h3><div class="hr"></div></div>
+                    <h3>Record Debt</h3>
+                    <div class="grid-2 no-print">
+                        <div><label>Date</label><input type="date" id="debtDate"></div>
+                        <div><label>Customer Name</label><input type="text" id="debtCustomer" placeholder="Customer name"></div>
+                    </div>
+                    <div class="grid-2 no-print" style="margin-top:12px;">
+                        <div><label>Amount (UGX)</label><input type="number" id="debtAmount" min="0" value="0"></div>
+                        <div><label>Due Date</label><input type="date" id="debtDueDate"></div>
+                    </div>
+                    <div><label>Description</label><textarea id="debtDescription" rows="2" placeholder="Reason for debt..." class="no-print"></textarea></div>
+                    <div class="stack no-print" style="margin-top:16px;">
+                        <button class="btn primary" id="btnAddDebt">Add Debt</button>
+                        <button class="btn ok" id="btnRecordPayment">Record Payment</button>
+                    </div>
+                    <div class="no-print" style="margin-top:12px;">
+                        <label>Select Debt for Payment</label>
+                        <select id="debtPaymentSelect"></select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Debts Report</h3><p>Generated: <span id="printDebtsGenerated"></span></p><div class="hr"></div></div>
+                    <div class="section-tools no-print"><h3 style="margin-right:auto">Debt Management</h3><button class="btn" id="btnPrintDebts">Print</button></div>
+                    <div class="grid-3 no-print" style="margin-bottom:16px;">
+                        <div><label>Status Filter</label><select id="debtFilter"><option value="all">All</option><option value="unpaid">Unpaid</option><option value="paid">Paid</option><option value="partial">Partial</option></select></div>
+                        <div><label>From Date</label><input type="date" id="debtFrom"></div>
+                        <div><label>To Date</label><input type="date" id="debtTo"></div>
+                    </div>
+                    <div><table class="table compact-table" id="debtsTable"><thead><tr><th>Date</th><th>Customer</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Status</th><th>Due Date</th><th class="no-print">Action</th></tr></thead><tbody></tbody></table></div>
+                    <div class="right" style="margin-top:16px;">
+                        <div class="stat"><span class="muted">Total Outstanding</span><b id="totalOutstanding" style="color:var(--bad);">UGX 0</b></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -495,17 +467,16 @@
         <!-- Reports -->
         <section id="reports" class="tabpanel" style="display:none;">
             <div class="card">
-                <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Profit & Loss Report</h3><p>Period: <span id="printReportPeriod"></span> | Generated: <span id="printReportGenerated"></span></p><div class="hr"></div></div>
+                <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Profit & Loss Report</h3><p>Period: <span id="printReportPeriod"></span></p><div class="hr"></div></div>
                 <div class="section-tools no-print"><h3 style="margin-right:auto">Profit & Loss Report</h3><button class="btn" id="btnPrintReport">Print</button><button class="btn" id="btnExportReport">Export Excel</button></div>
                 <div class="grid-4 no-print">
-                    <div><label>Report Period Start</label><input type="date" id="reportStart" value="2026-01-10"></div>
-                    <div><label>Report Period End</label><input type="date" id="reportEnd" value="2026-01-10"></div>
-                    <div><label>Compare With</label><select id="comparePeriod"><option value="none">No Comparison</option><option value="previous">Previous Period</option><option value="same_last_year">Same Period Last Year</option></select></div>
+                    <div><label>Report Period Start</label><input type="date" id="reportStart"></div>
+                    <div><label>Report Period End</label><input type="date" id="reportEnd"></div>
+                    <div><label>Compare With</label><select id="comparePeriod"><option value="none">No Comparison</option><option value="previous">Previous Period</option></select></div>
                     <div class="right"><button class="btn primary" id="btnGenerateReport">Generate Report</button></div>
                 </div>
                 <div class="hr no-print"></div>
                 <div id="reportOutput"></div>
-                <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>End of Profit & Loss Report</p></div>
             </div>
         </section>
 
@@ -513,24 +484,23 @@
         <section id="products" class="tabpanel" style="display:none;">
             <div class="row">
                 <div class="card" style="grid-column:span 4;">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Product Management Form</h3><div class="hr"></div></div>
+                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Product Management</h3><div class="hr"></div></div>
                     <h3>Add / Edit Product</h3>
-                    <div><label>Product Name</label><input id="productName" type="text" placeholder="e.g., Notebook" class="no-print"><span class="print-only"><strong>Product Name:</strong> <span id="printProductFormName">N/A</span></span></div>
-                    <div style="margin-top:12px;"><label>Category</label><input id="productCategory" type="text" placeholder="e.g., Stationery" class="no-print" list="categorySuggestions"><datalist id="categorySuggestions"></datalist><span class="print-only"><strong>Category:</strong> <span id="printProductFormCategory">N/A</span></span></div>
+                    <div><label>Product Name</label><input id="productName" type="text" placeholder="e.g., Notebook" class="no-print"></div>
+                    <div style="margin-top:12px;"><label>Category</label><input id="productCategory" type="text" placeholder="e.g., Stationery" class="no-print" list="categorySuggestions"><datalist id="categorySuggestions"></datalist></div>
                     <div class="grid-2" style="margin-top:12px;gap:12px;">
-                        <div><label>Purchase Price (UGX)</label><input id="productCost" type="number" min="0" value="0" class="no-print"><span class="print-only"><strong>Cost:</strong> <span id="printProductFormCost">UGX 0</span></span></div>
-                        <div><label>Sale Price (UGX)</label><input id="productPrice" type="number" min="0" value="0" class="no-print"><span class="print-only"><strong>Price:</strong> <span id="printProductFormPrice">UGX 0</span></span></div>
+                        <div><label>Purchase Price (UGX)</label><input id="productCost" type="number" min="0" value="0" class="no-print"></div>
+                        <div><label>Sale Price (UGX)</label><input id="productPrice" type="number" min="0" value="0" class="no-print"></div>
                     </div>
                     <div class="grid-2" style="margin-top:12px;gap:12px;">
-                        <div><label>Opening Stock</label><input id="productOpeningStock" type="number" min="0" value="0" class="no-print"><span class="print-only"><strong>Opening Stock:</strong> <span id="printProductFormOpening">0</span></span></div>
-                        <div><label>Min Stock Level</label><input id="productMinStock" type="number" min="0" value="10" class="no-print"><span class="print-only"><strong>Min Stock:</strong> <span id="printProductFormMinStock">10</span></span></div>
+                        <div><label>Opening Stock</label><input id="productOpeningStock" type="number" min="0" value="0" class="no-print"></div>
+                        <div><label>Reorder Level</label><input id="productMinStock" type="number" min="0" value="20" class="no-print"></div>
                     </div>
                     <div class="stack no-print" style="margin-top:20px;">
                         <button class="btn primary" id="btnSaveProduct">Save Product</button>
                         <button class="btn bad" id="btnDeleteProduct" disabled>Delete</button>
                     </div>
-                    <p class="help">Products are saved automatically</p>
-                    <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>This is a product management form. Saved products appear in the product list.</p></div>
+                    <p class="help">Products are saved automatically. Reorder level set to 20 by default.</p>
                 </div>
 
                 <div class="card" style="grid-column:span 8;">
@@ -541,8 +511,7 @@
                         <input type="text" id="productSearch" placeholder="Search products..." style="flex:1;">
                         <select id="productSort"><option value="name">Sort by Name</option><option value="category">Sort by Category</option><option value="stock">Sort by Stock</option><option value="profit">Sort by Profit Margin</option></select>
                     </div>
-                    <div><table class="table" id="productsTable"><thead><tr><th>Product</th><th>Category</th><th>Purchase Price</th><th>Sale Price</th><th>Profit Margin</th><th>Opening Stock</th><th>Sold</th><th>Current Stock</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
-                    <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>End of Product List</p></div>
+                    <div><table class="table" id="productsTable"><thead><tr><th>Product</th><th>Category</th><th>Purchase Price</th><th>Sale Price</th><th>Profit Margin</th><th>Opening Stock</th><th>Sold</th><th>Current Stock</th><th>Status</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
                 </div>
             </div>
         </section>
@@ -558,20 +527,19 @@
                         <button class="btn" id="btnSaveNow">Save Now</button>
                     </div>
                     <div class="stat" style="margin-top:12px;"><span class="muted">Last Saved</span><b id="lastSaveTime">Never</b></div>
-                    <p class="help">Exports all products, purchases, sales, and expenses to a JSON file.</p>
                 </div>
 
                 <div class="card" style="grid-column: span 4;">
-                    <h3>Excel Export</h3>
-                    <div class="stack section-tools">
-                        <button class="btn" id="btnExportAllData">Export All Data</button>
-                        <button class="btn" id="btnExportProfitLoss">Export P&L Report</button>
+                    <h3>Email Backup</h3>
+                    <p class="help">Send a complete backup of all data to your email. You can later restore from email.</p>
+                    <div class="stack" style="margin-top:12px;">
+                        <input type="email" id="emailBackupAddress" placeholder="your@email.com" style="flex:1;">
+                        <button class="btn primary" id="btnEmailBackup">Send Backup</button>
                     </div>
-                    <div class="grid-2" style="margin-top:12px; gap:8px;">
-                        <div><label>Export From</label><input type="date" id="exportFrom" value="2026-01-10"></div>
-                        <div><label>Export To</label><input type="date" id="exportTo" value="2026-01-10"></div>
+                    <div class="stack" style="margin-top:8px;">
+                        <label class="btn"><input type="file" id="emailRestoreFile" accept="application/json" style="display:none">Restore from Email</label>
+                        <span id="emailStatus" class="muted">No backup loaded</span>
                     </div>
-                    <p class="help">Export data for specific date ranges.</p>
                 </div>
 
                 <div class="card" style="grid-column: span 4;">
@@ -582,7 +550,6 @@
                         <button class="btn" id="btnCloudLoad" disabled>Load from Drive</button>
                     </div>
                     <div class="stack" style="margin-top:12px;"><span id="cloudStatus" class="pill">Signed out</span><span id="cloudFileInfo" class="muted"></span></div>
-                    <div class="stat" style="margin-top:12px;"><span class="muted">Last Cloud Backup</span><b id="lastCloudBackup">Never</b></div>
                 </div>
             </div>
 
@@ -592,9 +559,10 @@
                     <div class="warnmsg"><strong>Warning:</strong> These actions are irreversible. Make sure you have a backup.</div>
                     <div class="stack" style="margin-top:16px;">
                         <button class="btn bad" id="btnWipe">Reset ALL Data</button>
-                        <button class="btn bad" id="btnClearSheets">Clear All Sales Records</button>
+                        <button class="btn bad" id="btnClearSheets">Clear All Sales</button>
                         <button class="btn bad" id="btnClearPurchases">Clear All Purchases</button>
                         <button class="btn bad" id="btnClearExpenses">Clear All Expenses</button>
+                        <button class="btn bad" id="btnClearDebts">Clear All Debts</button>
                     </div>
                 </div>
             </div>
@@ -618,38 +586,26 @@
             }
             backgroundImages.forEach(src => { const img = new Image(); img.src = src; });
             startBackgroundRotation();
-            setupBackgroundControls();
+            document.querySelectorAll('.bg-btn').forEach((btn, index) => btn.addEventListener('click', () => setBackground(index)));
+            document.getElementById('bgPause').addEventListener('click', toggleBackgroundPause);
         }
-        function startBackgroundRotation() {
-            clearInterval(bgInterval);
-            if (!bgPaused) bgInterval = setInterval(rotateBackground, 8000);
-        }
+        function startBackgroundRotation() { clearInterval(bgInterval); if (!bgPaused) bgInterval = setInterval(rotateBackground, 8000); }
         function rotateBackground() {
             const slides = document.querySelectorAll('.background-slide'), buttons = document.querySelectorAll('.bg-btn');
-            slides.forEach(s => s.classList.remove('active'));
-            buttons.forEach(b => b.classList.remove('active'));
+            slides.forEach(s => s.classList.remove('active')); buttons.forEach(b => b.classList.remove('active'));
             currentBgIndex = (currentBgIndex + 1) % backgroundImages.length;
-            slides[currentBgIndex].classList.add('active');
-            buttons[currentBgIndex].classList.add('active');
+            slides[currentBgIndex].classList.add('active'); buttons[currentBgIndex].classList.add('active');
         }
         function setBackground(index) {
             const slides = document.querySelectorAll('.background-slide'), buttons = document.querySelectorAll('.bg-btn');
-            slides.forEach(s => s.classList.remove('active'));
-            buttons.forEach(b => b.classList.remove('active'));
-            currentBgIndex = index;
-            slides[currentBgIndex].classList.add('active');
-            buttons[currentBgIndex].classList.add('active');
+            slides.forEach(s => s.classList.remove('active')); buttons.forEach(b => b.classList.remove('active'));
+            currentBgIndex = index; slides[currentBgIndex].classList.add('active'); buttons[currentBgIndex].classList.add('active');
             if (!bgPaused) startBackgroundRotation();
         }
         function toggleBackgroundPause() {
-            bgPaused = !bgPaused;
-            const pauseBtn = document.getElementById('bgPause');
+            bgPaused = !bgPaused; const pauseBtn = document.getElementById('bgPause');
             if (bgPaused) { clearInterval(bgInterval); pauseBtn.innerHTML = '▶️'; pauseBtn.title = 'Resume Rotation'; }
             else { startBackgroundRotation(); pauseBtn.innerHTML = '⏸️'; pauseBtn.title = 'Pause Rotation'; }
-        }
-        function setupBackgroundControls() {
-            document.querySelectorAll('.bg-btn').forEach((btn, index) => btn.addEventListener('click', () => setBackground(index)));
-            document.getElementById('bgPause').addEventListener('click', toggleBackgroundPause);
         }
 
         // ================ UTILITIES ================
@@ -659,13 +615,14 @@
         function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
         // ================ DATA MANAGEMENT ================
-        const STORAGE_KEY = 'orji_supplies_management_v2';
+        const STORAGE_KEY = 'orji_supplies_enhanced_v3';
         let db = {
             products: [],
             dailySheets: {},
             purchases: [],
             expenses: [],
-            settings: { lastSave: new Date().toISOString(), accountingPeriod: 'monthly', periodStart: '2026-01-10', periodEnd: '2026-01-10' }
+            debts: [],
+            settings: { lastSave: new Date().toISOString(), periodStart: todayStr(), periodEnd: todayStr() }
         };
         try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) { const parsed = JSON.parse(saved); db = parsed; } } catch(e) { console.error('Error loading saved data:', e); }
 
@@ -681,10 +638,8 @@
         // ================ CATEGORY HELPER ================
         function getCategoryColor(cat) {
             if (!cat) return '#6b7280';
-            let hash = 0;
-            for (let i = 0; i < cat.length; i++) hash = cat.charCodeAt(i) + ((hash << 5) - hash);
-            const hue = Math.abs(hash % 360);
-            return `hsl(${hue}, 70%, 65%)`;
+            let hash = 0; for (let i = 0; i < cat.length; i++) hash = cat.charCodeAt(i) + ((hash << 5) - hash);
+            return `hsl(${Math.abs(hash % 360)}, 70%, 65%)`;
         }
         function getCategoryPillHTML(category) {
             if (!category) return '<span class="pill">Uncategorized</span>';
@@ -692,48 +647,12 @@
             return `<span class="pill category-pill" style="background:${color}; border-color:${color}; color:white;">${category}</span>`;
         }
 
-        // ================ PRINT ================
-        function setupPrintFunctionality() {
-            document.getElementById('btnPrintInventory').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintSalesHistory').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintProductHistory').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintPurchases').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintExpenses').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintReport').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintProducts').addEventListener('click', () => { preparePrintData(); window.print(); });
-        }
-        function preparePrintData() {
-            const now = new Date(); const fd = now.toLocaleDateString(); const ft = now.toLocaleTimeString();
-            document.getElementById('printInventoryDate').textContent = document.getElementById('inventoryDate').value || '2026-01-10';
-            document.getElementById('printInventoryGenerated').textContent = `${fd} ${ft}`;
-            const sf = document.getElementById('saleFrom').value || '2026-01-10', st = document.getElementById('saleTo').value || '2026-01-10';
-            document.getElementById('printSalesPeriod').textContent = `${sf} to ${st}`;
-            document.getElementById('printSalesGenerated').textContent = `${fd} ${ft}`;
-            const ps = document.getElementById('productHistorySelect'), pn = ps.options[ps.selectedIndex]?.text || 'All Products';
-            const pf = document.getElementById('productHistoryFrom').value || '2026-01-10', pt = document.getElementById('productHistoryTo').value || '2026-01-10';
-            document.getElementById('printProductName').textContent = pn; document.getElementById('printProductPeriod').textContent = `${pf} to ${pt}`;
-            const ef = document.getElementById('expenseFrom').value || '2026-01-10', et = document.getElementById('expenseTo').value || '2026-01-10';
-            document.getElementById('printExpensesPeriod').textContent = `${ef} to ${et}`; document.getElementById('printExpensesGenerated').textContent = `${fd} ${ft}`;
-            const rs = document.getElementById('reportStart').value || '2026-01-10', re = document.getElementById('reportEnd').value || '2026-01-10';
-            document.getElementById('printReportPeriod').textContent = `${rs} to ${re}`; document.getElementById('printReportGenerated').textContent = `${fd} ${ft}`;
-            document.getElementById('printProductsGenerated').textContent = `${fd} ${ft}`;
-            // Purchase print
-            const puf = document.getElementById('purchaseFrom').value || '2026-01-10', put = document.getElementById('purchaseTo').value || '2026-01-10';
-            document.getElementById('printPurchasePeriod').textContent = `${puf} to ${put}`;
-            document.getElementById('printPurchaseGenerated').textContent = `${fd} ${ft}`;
-            updateFormDataForPrint();
-        }
-        function updateFormDataForPrint() {
-            document.getElementById('printExpenseFormDate').textContent = document.getElementById('expenseDate').value || '2026-01-10';
-            document.getElementById('printExpenseFormType').textContent = document.getElementById('expenseType').value || 'rent';
-            document.getElementById('printExpenseFormAmount').textContent = UGX(parseInt(document.getElementById('expenseAmount').value) || 0);
-            document.getElementById('printExpenseFormDescription').textContent = document.getElementById('expenseDescription').value || 'No description provided';
-            document.getElementById('printProductFormName').textContent = document.getElementById('productName').value || 'N/A';
-            document.getElementById('printProductFormCategory').textContent = document.getElementById('productCategory').value || 'N/A';
-            document.getElementById('printProductFormCost').textContent = UGX(parseInt(document.getElementById('productCost').value) || 0);
-            document.getElementById('printProductFormPrice').textContent = UGX(parseInt(document.getElementById('productPrice').value) || 0);
-            document.getElementById('printProductFormOpening').textContent = document.getElementById('productOpeningStock').value || '0';
-            document.getElementById('printProductFormMinStock').textContent = document.getElementById('productMinStock').value || '10';
+        // ================ SET DATES ================
+        function setAllDates() {
+            const today = todayStr();
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                if (!input.value || input.value === '') input.value = today;
+            });
         }
 
         // ================ DASHBOARD ================
@@ -749,51 +668,42 @@
             let mCat = '-', mMax = 0; for (const [c, s] of Object.entries(catSales)) { if (s > mMax) { mMax = s; mCat = c; } }
             document.getElementById('statMostMoving').textContent = `${mCat} (${mMax} units)`;
 
-            const ps = document.getElementById('periodStart').value || '2026-01-10', pe = document.getElementById('periodEnd').value || '2026-01-10';
+            // Debts
+            let outstanding = 0;
+            db.debts.forEach(d => { if (d.status !== 'paid') outstanding += (d.amount - d.paidAmount); });
+            document.getElementById('statOutstandingDebts').textContent = UGX(outstanding);
+
+            const ps = document.getElementById('periodStart').value || todayStr();
+            const pe = document.getElementById('periodEnd').value || todayStr();
             let grossProfit = 0, totalExpenses = 0;
             Object.values(db.dailySheets).forEach(sheet => { if (sheet.date >= ps && sheet.date <= pe) grossProfit += sheet.totalProfit || 0; });
             db.expenses.forEach(e => { if (e.date >= ps && e.date <= pe) totalExpenses += e.amount || 0; });
             const netProfit = grossProfit - totalExpenses;
-            const margin = grossProfit > 0 ? ((netProfit / grossProfit) * 100).toFixed(1) : 0;
-            document.getElementById('statGrossProfit').textContent = UGX(grossProfit);
             document.getElementById('statTotalExpenses').textContent = UGX(totalExpenses);
             document.getElementById('statNetProfit').textContent = UGX(netProfit);
+
             const statusEl = document.getElementById('profitStatus');
-            if (netProfit > 0) { statusEl.innerHTML = `<strong>✅ PROFITABLE:</strong> Net profit of ${UGX(netProfit)} (${margin}% margin)`; statusEl.className = 'goodmsg'; }
+            if (netProfit > 0) { statusEl.innerHTML = `<strong>✅ PROFITABLE:</strong> Net profit of ${UGX(netProfit)}`; statusEl.className = 'goodmsg'; }
             else if (netProfit < 0) { statusEl.innerHTML = `<strong>⚠️ LOSS MAKING:</strong> Net loss of ${UGX(Math.abs(netProfit))}`; statusEl.className = 'badmsg'; }
             else { statusEl.innerHTML = `<strong>⚖️ BREAK EVEN:</strong> Business is breaking even`; statusEl.className = 'warnmsg'; }
-            updateTopProductsList();
-        }
-        function updateTopProductsList() {
-            const top = [...db.products].filter(p => p.soldCount > 0).sort((a,b) => (b.soldCount||0) - (a.soldCount||0)).slice(0,5);
-            const el = document.getElementById('topProductsList');
-            if (!el) return;
-            if (top.length === 0) el.innerHTML = '<div class="muted">No sales data yet.</div>';
-            else el.innerHTML = top.map(p => `<div class="data-row"><div><strong>${p.name}</strong> ${getCategoryPillHTML(p.category)}</div><div><span class="profit-positive">${p.soldCount} sold</span><div class="muted" style="font-size:12px;">${UGX(p.totalProfit || 0)} profit</div></div></div>`).join('');
+
+            // Low stock alerts
+            updateLowStockAlerts();
         }
 
-        // ================ TABS ================
-        function setupTabs() {
-            const tabs = document.querySelectorAll('.tab'), panels = document.querySelectorAll('.tabpanel');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    panels.forEach(p => p.style.display = 'none');
-                    tab.classList.add('active');
-                    const id = tab.getAttribute('data-tab');
-                    const panel = document.getElementById(id);
-                    if (panel) {
-                        panel.style.display = 'block';
-                        if (id === 'products') renderProducts();
-                        if (id === 'sales') renderSales();
-                        if (id === 'purchases') renderPurchases();
-                        if (id === 'inventory') renderInventory();
-                        if (id === 'expenses') renderExpenses();
-                        if (id === 'reports') initReports();
-                        if (id === 'dashboard') updateDashboardStats();
-                    }
-                });
-            });
+        function updateLowStockAlerts() {
+            const el = document.getElementById('lowStockAlerts');
+            const low = db.products.filter(p => (p.currentStock || 0) <= 20);
+            if (low.length === 0) {
+                el.innerHTML = '<div class="goodmsg">✅ All products are above reorder level (20 units).</div>';
+            } else {
+                el.innerHTML = low.map(p => 
+                    `<div class="data-row low-stock" style="padding: 12px; margin-bottom: 4px; border-radius: 6px;">
+                        <div><strong>${p.name}</strong> ${getCategoryPillHTML(p.category)}</div>
+                        <div style="color:var(--bad);font-weight:bold;">${p.currentStock || 0} units left <span style="font-size:12px;font-weight:normal;">(Reorder at 20)</span></div>
+                    </div>`
+                ).join('');
+            }
         }
 
         // ================ PRODUCTS ================
@@ -814,19 +724,21 @@
             if (tbody) {
                 tbody.innerHTML = filtered.map(p => {
                     const margin = p.purchasePrice > 0 ? ((p.salePrice - p.purchasePrice) / p.purchasePrice * 100).toFixed(1) : 0;
-                    const low = (p.currentStock||0) <= (p.minStockLevel||5);
-                    const ppu = p.salePrice - p.purchasePrice;
-                    return `<tr ${low?'class="highlight"':''}>
-                <td><strong>${p.name}</strong></td>
-                <td>${getCategoryPillHTML(p.category)}</td>
-                <td>${UGX(p.purchasePrice||0)}</td>
-                <td>${UGX(p.salePrice||0)}</td>
-                <td><span class="profit-positive">${margin}% (${UGX(ppu)})</span></td>
-                <td>${p.openingStock||0}</td>
-                <td>${p.soldCount||0}</td>
-                <td><strong>${p.currentStock||p.openingStock||0}</strong></td>
-                <td class="no-print"><button class="btn" data-edit="${p.id}">Edit</button></td>
-              </tr>`;
+                    const stock = p.currentStock || 0;
+                    const low = stock <= 20;
+                    const status = low ? '<span class="pill" style="background:var(--bad);color:white;">⚠️ Reorder</span>' : '<span class="pill" style="background:var(--ok);color:white;">✓ Stocked</span>';
+                    return `<tr class="${low ? 'low-stock' : ''}">
+                        <td><strong>${p.name}</strong></td>
+                        <td>${getCategoryPillHTML(p.category)}</td>
+                        <td>${UGX(p.purchasePrice||0)}</td>
+                        <td>${UGX(p.salePrice||0)}</td>
+                        <td><span class="${margin >= 0 ? 'profit-positive' : 'profit-negative'}">${margin}%</span></td>
+                        <td>${p.openingStock||0}</td>
+                        <td>${p.soldCount||0}</td>
+                        <td><strong>${stock}</strong></td>
+                        <td>${status}</td>
+                        <td class="no-print"><button class="btn" data-edit="${p.id}">Edit</button></td>
+                    </tr>`;
                 }).join('');
             }
             populateProductSelects();
@@ -849,13 +761,14 @@
             cats.forEach(c => { const opt = document.createElement('option'); opt.value = c; datalist.appendChild(opt); });
         }
         function populateProductSelects() {
-            const saleSel = document.getElementById('saleProduct'), histSel = document.getElementById('productHistorySelect'), purSel = document.getElementById('purchaseProduct');
-            const list = '<option value="">Select Product</option>' + db.products.map(p => `<option value="${p.id}">${p.name} (Stock: ${p.currentStock||p.openingStock||0})</option>`).join('');
+            const saleSel = document.getElementById('saleProduct'), purSel = document.getElementById('purchaseProduct');
+            const list = db.products.map(p => `<option value="${p.id}">${p.name} (Stock: ${p.currentStock||0})</option>`).join('');
             if (saleSel) {
-                saleSel.innerHTML = '<option value="">Select Product</option>' + db.products.map(p => `<option value="${p.id}" data-price="${p.salePrice}">${p.name} (Stock: ${p.currentStock||p.openingStock||0}) - ${UGX(p.salePrice||0)}</option>`).join('');
+                saleSel.innerHTML = '<option value="">Select Product</option>' + db.products.map(p => 
+                    `<option value="${p.id}" data-price="${p.salePrice}">${p.name} (Stock: ${p.currentStock||0})</option>`
+                ).join('');
             }
-            if (histSel) histSel.innerHTML = '<option value="">Select Product</option>' + db.products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-            if (purSel) purSel.innerHTML = list;
+            if (purSel) purSel.innerHTML = '<option value="">Select Product</option>' + list;
         }
 
         function setupProducts() {
@@ -868,7 +781,7 @@
                 document.getElementById('productCost').value = p.purchasePrice || 0;
                 document.getElementById('productPrice').value = p.salePrice || 0;
                 document.getElementById('productOpeningStock').value = p.openingStock || 0;
-                document.getElementById('productMinStock').value = p.minStockLevel || 10;
+                document.getElementById('productMinStock').value = p.minStockLevel || 20;
                 document.getElementById('btnDeleteProduct').disabled = false;
             });
             document.getElementById('btnSaveProduct').addEventListener('click', () => {
@@ -877,7 +790,7 @@
                 const cost = parseInt(document.getElementById('productCost').value) || 0;
                 const price = parseInt(document.getElementById('productPrice').value) || 0;
                 const opening = parseInt(document.getElementById('productOpeningStock').value) || 0;
-                const min = parseInt(document.getElementById('productMinStock').value) || 10;
+                const min = parseInt(document.getElementById('productMinStock').value) || 20;
                 if (editingProductId) {
                     const p = db.products.find(x => x.id === editingProductId);
                     if (p) { p.name = name; p.category = cat; p.purchasePrice = cost; p.salePrice = price; p.openingStock = opening; p.minStockLevel = min; if (p.currentStock === undefined) p.currentStock = opening; }
@@ -887,7 +800,7 @@
                 saveData(); renderProducts(); updateDashboardStats(); populateProductSelects();
                 document.getElementById('productName').value = ''; document.getElementById('productCategory').value = '';
                 document.getElementById('productCost').value = '0'; document.getElementById('productPrice').value = '0';
-                document.getElementById('productOpeningStock').value = '0'; document.getElementById('productMinStock').value = '10';
+                document.getElementById('productOpeningStock').value = '0'; document.getElementById('productMinStock').value = '20';
                 document.getElementById('btnDeleteProduct').disabled = true; editingProductId = null;
                 alert('Product saved successfully!');
             });
@@ -897,7 +810,7 @@
                 saveData(); renderProducts(); updateDashboardStats(); populateProductSelects();
                 document.getElementById('productName').value = ''; document.getElementById('productCategory').value = '';
                 document.getElementById('productCost').value = '0'; document.getElementById('productPrice').value = '0';
-                document.getElementById('productOpeningStock').value = '0'; document.getElementById('productMinStock').value = '10';
+                document.getElementById('productOpeningStock').value = '0'; document.getElementById('productMinStock').value = '20';
                 document.getElementById('btnDeleteProduct').disabled = true; editingProductId = null;
                 alert('Product deleted.');
             });
@@ -907,40 +820,30 @@
 
         // ================ SALES ================
         let dailySaleItems = [];
-        function renderSales() { dailySaleItems = []; document.getElementById('sheetReference').value = ''; document.getElementById('saleQty').value = '1'; document.getElementById('salePrice').value = ''; updateDailySaleTotal(); loadRecentSales(); }
+        function renderSales() { dailySaleItems = []; document.getElementById('sheetReference').value = ''; document.getElementById('customerName').value = ''; document.getElementById('saleQty').value = '1'; document.getElementById('salePrice').value = ''; updateDailySaleTotal(); loadRecentSales(); }
         function updateDailySaleTotal() {
             const total = dailySaleItems.reduce((s, i) => s + (i.total || 0), 0);
             const profit = dailySaleItems.reduce((s, i) => s + (i.profit || 0), 0);
             document.getElementById('saleTotal').textContent = UGX(total);
-            document.getElementById('saleProfit').textContent = UGX(profit);
+            const profitEl = document.getElementById('saleProfit');
+            profitEl.textContent = UGX(profit);
+            profitEl.className = profit >= 0 ? 'profit-positive' : 'profit-negative';
             const tbody = document.querySelector('#saleItemsTable tbody');
-            if (tbody) tbody.innerHTML = dailySaleItems.map((item, idx) => `<tr><td>${item.productName}</td><td>${item.quantity}</td><td>${UGX(item.unitPrice)}</td><td>${UGX(item.total)}</td><td><span class="profit-positive">${UGX(item.profit)}</span></td><td class="no-print"><button class="btn bad" data-remove-sale="${idx}">×</button></td></tr>`).join('');
+            if (tbody) tbody.innerHTML = dailySaleItems.map((item, idx) => {
+                const profitClass = item.profit >= 0 ? 'profit-positive' : 'profit-negative';
+                return `<tr><td>${item.productName}</td><td>${item.quantity}</td><td>${UGX(item.unitPrice)}</td><td>${UGX(item.total)}</td><td class="${profitClass}">${UGX(item.profit)}</td><td class="no-print"><button class="btn bad" data-remove-sale="${idx}">×</button></td></tr>`;
+            }).join('');
         }
         function loadRecentSales() {
-            const from = document.getElementById('saleFrom').value || '2026-01-10', to = document.getElementById('saleTo').value || '2026-01-10';
+            const from = document.getElementById('saleFrom').value || todayStr(), to = document.getElementById('saleTo').value || todayStr();
             const filtered = []; for (const [date, sheet] of Object.entries(db.dailySheets)) { if (date >= from && date <= to) filtered.push({ date, ...sheet }); }
             filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
             const tbody = document.querySelector('#salesHistoryTable tbody');
-            if (tbody) tbody.innerHTML = filtered.map(s => `<tr><td><strong>${s.date}</strong></td><td>${s.items?.length||0} items</td><td>${UGX(s.totalSales||0)}</td><td><span class="profit-positive">${UGX(s.totalProfit||0)}</span></td><td><span class="pill">${s.source||'manual'}</span></td></tr>`).join('');
-        }
-        function loadProductHistory() {
-            const pid = document.getElementById('productHistorySelect').value, from = document.getElementById('productHistoryFrom').value, to = document.getElementById('productHistoryTo').value;
-            if (!pid) return; const p = db.products.find(x => x.id === pid); if (!p) return;
-            const sales = [];
-            for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                if (date >= from && date <= to) {
-                    const items = sheet.items.filter(i => i.productName === p.name);
-                    if (items.length) {
-                        const qty = items.reduce((s, i) => s + i.quantity, 0);
-                        const tot = items.reduce((s, i) => s + i.total, 0);
-                        const prof = items.reduce((s, i) => s + i.profit, 0);
-                        sales.push({ date, qty, totalSales: tot, totalProfit: prof, avgPrice: qty > 0 ? tot / qty : 0 });
-                    }
-                }
-            }
-            sales.sort((a,b) => new Date(b.date) - new Date(a.date));
-            const tbody = document.querySelector('#productHistoryTable tbody');
-            if (tbody) tbody.innerHTML = sales.map(s => `<tr><td><strong>${s.date}</strong></td><td>${s.qty}</td><td>${UGX(s.totalSales)}</td><td><span class="profit-positive">${UGX(s.totalProfit)}</span></td><td>${UGX(s.avgPrice)}</td></tr>`).join('');
+            if (tbody) tbody.innerHTML = filtered.map(s => {
+                const profit = s.totalProfit || 0;
+                const profitClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
+                return `<tr><td><strong>${s.date}</strong></td><td>${s.customer || '-'}</td><td>${s.items?.length||0} items</td><td>${UGX(s.totalSales||0)}</td><td class="${profitClass}">${UGX(profit)}</td></tr>`;
+            }).join('');
         }
         function setupSales() {
             document.getElementById('saleProduct').addEventListener('change', function() { const opt = this.options[this.selectedIndex]; if (opt && opt.value) document.getElementById('salePrice').value = opt.getAttribute('data-price') || ''; });
@@ -959,8 +862,9 @@
             });
             document.getElementById('btnSaveDailySales').addEventListener('click', () => {
                 if (!dailySaleItems.length) { alert('Add items first'); return; }
-                const date = document.getElementById('saleDate').value || '2026-01-10';
+                const date = document.getElementById('saleDate').value || todayStr();
                 const ref = document.getElementById('sheetReference').value.trim() || 'manual';
+                const customer = document.getElementById('customerName').value.trim() || '';
                 if (db.dailySheets[date] && !confirm(`Record exists for ${date}. Overwrite?`)) return;
                 const total = dailySaleItems.reduce((s, i) => s + i.total, 0);
                 const profit = dailySaleItems.reduce((s, i) => s + i.profit, 0);
@@ -968,139 +872,65 @@
                     const p = db.products.find(x => x.id === item.productId);
                     if (p) { p.currentStock = Math.max(0, (p.currentStock || p.openingStock || 0) - item.quantity); p.soldCount = (p.soldCount || 0) + item.quantity; p.totalProfit = (p.totalProfit || 0) + item.profit; }
                 });
-                db.dailySheets[date] = { date, items: [...dailySaleItems], totalSales: total, totalProfit: profit, source: 'manual', sheetReference: ref, recordedAt: new Date().toISOString() };
+                db.dailySheets[date] = { date, items: [...dailySaleItems], totalSales: total, totalProfit: profit, source: 'manual', sheetReference: ref, customer, recordedAt: new Date().toISOString() };
                 saveData(); renderSales(); renderProducts(); renderInventory(); updateDashboardStats();
                 alert(`Sales saved for ${date}! Total: ${UGX(total)}, Profit: ${UGX(profit)}`);
             });
             document.getElementById('btnFilterSales').addEventListener('click', loadRecentSales);
-            document.getElementById('productHistorySelect').addEventListener('change', loadProductHistory);
-            document.getElementById('productHistoryFrom').addEventListener('change', loadProductHistory);
-            document.getElementById('productHistoryTo').addEventListener('change', loadProductHistory);
         }
 
         // ================ PURCHASES ================
-        function renderPurchases() {
-            document.getElementById('purchaseQty').value = '1';
-            document.getElementById('purchaseUnitCost').value = '0';
-            loadPurchases();
-            populateProductSelects(); // ensure dropdowns are fresh
-        }
-
+        function renderPurchases() { document.getElementById('purchaseQty').value = '1'; document.getElementById('purchaseUnitCost').value = '0'; loadPurchases(); populateProductSelects(); }
         function loadPurchases() {
-            const from = document.getElementById('purchaseFrom').value || '2026-01-10';
-            const to = document.getElementById('purchaseTo').value || '2026-01-10';
+            const from = document.getElementById('purchaseFrom').value || todayStr(), to = document.getElementById('purchaseTo').value || todayStr();
             let filtered = db.purchases.filter(p => p.date >= from && p.date <= to);
-            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
             const tbody = document.querySelector('#purchasesTable tbody');
             if (tbody) {
-                tbody.innerHTML = filtered.map((p, idx) => `
-                    <tr>
-                        <td>${p.date}</td>
-                        <td>${p.productName}</td>
-                        <td>${p.quantity}</td>
-                        <td>${UGX(p.unitCost)}</td>
-                        <td>${UGX(p.quantity * p.unitCost)}</td>
-                        <td class="no-print"><button class="btn bad" data-remove-purchase="${idx}">×</button></td>
-                    </tr>
-                `).join('');
+                tbody.innerHTML = filtered.map((p, idx) => `<tr><td>${p.date}</td><td>${p.productName}</td><td>${p.quantity}</td><td>${UGX(p.unitCost)}</td><td>${UGX(p.quantity * p.unitCost)}</td><td class="no-print"><button class="btn bad" data-remove-purchase="${idx}">×</button></td></tr>`).join('');
             }
-
             const totalCost = filtered.reduce((sum, p) => sum + (p.quantity * p.unitCost), 0);
             document.getElementById('totalPurchases').textContent = UGX(totalCost);
         }
-
         function setupPurchases() {
-            // Add purchase
             document.getElementById('btnAddPurchase').addEventListener('click', () => {
-                const pid = document.getElementById('purchaseProduct').value;
-                const qty = parseInt(document.getElementById('purchaseQty').value) || 1;
-                const unitCost = parseInt(document.getElementById('purchaseUnitCost').value) || 0;
-                const date = document.getElementById('purchaseDate').value || '2026-01-10';
-
-                if (!pid) { alert('Select a product'); return; }
-                if (qty <= 0) { alert('Enter valid quantity'); return; }
-                if (unitCost <= 0) { alert('Enter valid unit cost'); return; }
-
-                const product = db.products.find(x => x.id === pid);
-                if (!product) { alert('Product not found'); return; }
-
-                // Add to purchases array
-                const purchaseRecord = {
-                    id: 'pur_' + Date.now(),
-                    date: date,
-                    productId: pid,
-                    productName: product.name,
-                    quantity: qty,
-                    unitCost: unitCost,
-                    recordedAt: new Date().toISOString()
-                };
-                db.purchases.push(purchaseRecord);
-
-                // Update product stock and purchase price (optional: update cost if desired)
+                const pid = document.getElementById('purchaseProduct').value, qty = parseInt(document.getElementById('purchaseQty').value) || 1, unitCost = parseInt(document.getElementById('purchaseUnitCost').value) || 0, date = document.getElementById('purchaseDate').value || todayStr();
+                if (!pid) { alert('Select a product'); return; } if (qty <= 0) { alert('Enter valid quantity'); return; } if (unitCost <= 0) { alert('Enter valid unit cost'); return; }
+                const product = db.products.find(x => x.id === pid); if (!product) { alert('Product not found'); return; }
+                db.purchases.push({ id: 'pur_' + Date.now(), date, productId: pid, productName: product.name, quantity: qty, unitCost, recordedAt: new Date().toISOString() });
                 product.currentStock = (product.currentStock || product.openingStock || 0) + qty;
-                // If you want to update the average cost or just keep it, we can optionally update purchasePrice
-                // For simplicity, we keep the original purchasePrice, but user can edit it.
-
-                saveData();
-                renderPurchases();
-                renderProducts();
-                renderInventory();
-                updateDashboardStats();
+                saveData(); renderPurchases(); renderProducts(); renderInventory(); updateDashboardStats();
                 alert(`Purchase added! ${qty} x ${product.name} added.`);
             });
-
-            // Delete purchase
             document.getElementById('purchasesTable').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-remove-purchase]');
-                if (!btn) return;
+                const btn = e.target.closest('[data-remove-purchase]'); if (!btn) return;
                 const idx = parseInt(btn.getAttribute('data-remove-purchase'));
-
-                // Get the current filtered list to match the index
-                const from = document.getElementById('purchaseFrom').value || '2026-01-10';
-                const to = document.getElementById('purchaseTo').value || '2026-01-10';
+                const from = document.getElementById('purchaseFrom').value || todayStr(), to = document.getElementById('purchaseTo').value || todayStr();
                 const filtered = db.purchases.filter(p => p.date >= from && p.date <= to);
-                const realPurchase = filtered[idx];
-                if (!realPurchase) return;
-
+                const realPurchase = filtered[idx]; if (!realPurchase) return;
                 if (!confirm(`Delete purchase of ${realPurchase.quantity} x ${realPurchase.productName} on ${realPurchase.date}?`)) return;
-
-                // Find and remove from db
                 const realIdx = db.purchases.findIndex(p => p.id === realPurchase.id);
                 if (realIdx > -1) {
-                    // Reverse stock update
                     const product = db.products.find(p => p.id === realPurchase.productId);
-                    if (product) {
-                        product.currentStock = Math.max(0, (product.currentStock || 0) - realPurchase.quantity);
-                    }
+                    if (product) product.currentStock = Math.max(0, (product.currentStock || 0) - realPurchase.quantity);
                     db.purchases.splice(realIdx, 1);
-                    saveData();
-                    renderPurchases();
-                    renderProducts();
-                    renderInventory();
-                    updateDashboardStats();
+                    saveData(); renderPurchases(); renderProducts(); renderInventory(); updateDashboardStats();
                     alert('Purchase deleted and stock reverted.');
                 }
             });
-
             document.getElementById('btnFilterPurchases').addEventListener('click', loadPurchases);
         }
 
         // ================ INVENTORY ================
         function renderInventory() {
-            const date = document.getElementById('inventoryDate').value || '2026-01-10';
+            const date = document.getElementById('inventoryDate').value || todayStr();
             const cat = document.getElementById('filterCategory').value;
             let filtered = db.products;
             if (cat) filtered = filtered.filter(p => p.category === cat);
-
             filtered.forEach(p => {
-                // Calculate purchases up to date
                 const purchases = db.purchases.filter(pur => pur.productId === p.id && pur.date <= date);
                 const totalPurchased = purchases.reduce((sum, pur) => sum + pur.quantity, 0);
-
-                // Calculate sales up to date
-                let sold = 0;
-                let profit = 0;
+                let sold = 0, profit = 0;
                 Object.entries(db.dailySheets).forEach(([d, sheet]) => {
                     if (d <= date) {
                         const items = sheet.items.filter(i => i.productName === p.name);
@@ -1108,48 +938,44 @@
                         profit += items.reduce((s, i) => s + i.profit, 0);
                     }
                 });
-
-                p.calcPurchased = totalPurchased;
-                p.calcSold = sold;
-                p.calcProfit = profit;
+                p.calcPurchased = totalPurchased; p.calcSold = sold; p.calcProfit = profit;
                 p.calcClosing = Math.max(0, (p.openingStock || 0) + totalPurchased - sold);
                 p.stockValue = p.calcClosing * (p.purchasePrice || 0);
             });
-
             const tbody = document.querySelector('#inventoryTable tbody');
             if (tbody) {
                 tbody.innerHTML = filtered.map(p => {
-                    const low = p.calcClosing <= (p.minStockLevel || 5);
-                    return `<tr ${low?'class="highlight"':''}>
-                <td><strong>${p.name}</strong></td>
-                <td>${getCategoryPillHTML(p.category)}</td>
-                <td>${p.openingStock||0}</td>
-                <td>${p.calcPurchased}</td>
-                <td>${p.calcSold}</td>
-                <td><strong>${p.calcClosing}</strong></td>
-                <td>${UGX(p.purchasePrice||0)}</td>
-                <td>${UGX(p.salePrice||0)}</td>
-                <td>${UGX(p.stockValue||0)}</td>
-                <td><span class="profit-positive">${UGX(p.calcProfit||0)}</span></td>
-              </tr>`;
+                    const low = p.calcClosing <= 20;
+                    const status = low ? '<span class="pill" style="background:var(--bad);color:white;">⚠️ Reorder</span>' : '<span class="pill" style="background:var(--ok);color:white;">✓ Stocked</span>';
+                    const profitClass = p.calcProfit >= 0 ? 'profit-positive' : 'profit-negative';
+                    return `<tr class="${low ? 'low-stock' : ''}">
+                        <td><strong>${p.name}</strong></td>
+                        <td>${getCategoryPillHTML(p.category)}</td>
+                        <td>${p.openingStock||0}</td>
+                        <td>${p.calcPurchased}</td>
+                        <td>${p.calcSold}</td>
+                        <td><strong>${p.calcClosing}</strong></td>
+                        <td>${UGX(p.purchasePrice||0)}</td>
+                        <td>${UGX(p.salePrice||0)}</td>
+                        <td>${UGX(p.stockValue||0)}</td>
+                        <td class="${profitClass}">${UGX(p.calcProfit||0)}</td>
+                        <td>${status}</td>
+                    </tr>`;
                 }).join('');
                 const totalVal = filtered.reduce((s, p) => s + (p.stockValue || 0), 0);
                 const totalProf = filtered.reduce((s, p) => s + (p.calcProfit || 0), 0);
-                const lowCount = filtered.filter(p => p.calcClosing <= (p.minStockLevel || 5)).length;
-                tbody.innerHTML += `<tr style="background:rgba(248,250,252,0.9);font-weight:bold;"><td colspan="8">Summary: ${filtered.length} products, ${lowCount} low stock</td><td>${UGX(totalVal)}</td><td><span class="profit-positive">${UGX(totalProf)}</span></td></tr>`;
+                const lowCount = filtered.filter(p => p.calcClosing <= 20).length;
+                tbody.innerHTML += `<tr style="background:rgba(248,250,252,0.9);font-weight:bold;"><td colspan="9">Summary: ${filtered.length} products, ${lowCount} below reorder level (20)</td><td>${UGX(totalProf)}</td><td>${UGX(totalVal)}</td></tr>`;
             }
         }
-
         function setupInventory() {
             document.getElementById('inventoryDate').addEventListener('change', renderInventory);
             document.getElementById('filterCategory').addEventListener('change', renderInventory);
             document.getElementById('btnUpdateInventory').addEventListener('click', renderInventory);
-
             document.getElementById('btnExportInventory').addEventListener('click', () => {
-                const date = document.getElementById('inventoryDate').value || '2026-01-10';
+                const date = document.getElementById('inventoryDate').value || todayStr();
                 const cat = document.getElementById('filterCategory').value;
-                let filtered = db.products;
-                if (cat) filtered = filtered.filter(p => p.category === cat);
+                let filtered = db.products; if (cat) filtered = filtered.filter(p => p.category === cat);
                 filtered.forEach(p => {
                     const purchases = db.purchases.filter(pur => pur.productId === p.id && pur.date <= date);
                     const totalPurchased = purchases.reduce((sum, pur) => sum + pur.quantity, 0);
@@ -1165,8 +991,8 @@
                     p.calcClosing = Math.max(0, (p.openingStock || 0) + totalPurchased - sold);
                     p.stockValue = p.calcClosing * (p.purchasePrice || 0);
                 });
-                const headers = ['Product', 'Category', 'Opening', 'Purchased', 'Sold', 'Closing', 'Cost Price', 'Sale Price', 'Stock Value', 'Profit'];
-                const rows = filtered.map(p => [p.name, p.category||'', p.openingStock||0, p.calcPurchased, p.calcSold, p.calcClosing, p.purchasePrice||0, p.salePrice||0, p.stockValue||0, p.calcProfit||0]);
+                const headers = ['Product', 'Category', 'Opening', 'Purchased', 'Sold', 'Closing', 'Cost Price', 'Sale Price', 'Stock Value', 'Profit', 'Status'];
+                const rows = filtered.map(p => [p.name, p.category||'', p.openingStock||0, p.calcPurchased, p.calcSold, p.calcClosing, p.purchasePrice||0, p.salePrice||0, p.stockValue||0, p.calcProfit||0, p.calcClosing <= 20 ? 'Reorder' : 'Stocked']);
                 const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
                 download(`inventory-${date}.csv`, new Blob([csv], { type: 'text/csv' }));
             });
@@ -1175,7 +1001,7 @@
         // ================ EXPENSES ================
         function renderExpenses() { document.getElementById('expenseDescription').value = ''; document.getElementById('expenseAmount').value = '0'; loadExpenses(); }
         function loadExpenses() {
-            const from = document.getElementById('expenseFrom').value || '2026-01-10', to = document.getElementById('expenseTo').value || '2026-01-10';
+            const from = document.getElementById('expenseFrom').value || todayStr(), to = document.getElementById('expenseTo').value || todayStr();
             const filtered = db.expenses.filter(e => e.date >= from && e.date <= to).sort((a,b) => new Date(b.date) - new Date(a.date));
             const tbody = document.querySelector('#expensesTable tbody');
             if (tbody) tbody.innerHTML = filtered.map((e, idx) => `<tr><td>${e.date}</td><td><span class="pill">${e.type}</span></td><td>${e.description||''}</td><td>${UGX(e.amount)}</td><td class="no-print"><button class="btn bad" data-remove-expense="${idx}">×</button></td></tr>`).join('');
@@ -1184,7 +1010,7 @@
         }
         function setupExpenses() {
             document.getElementById('btnSaveExpense').addEventListener('click', () => {
-                const date = document.getElementById('expenseDate').value || '2026-01-10', type = document.getElementById('expenseType').value;
+                const date = document.getElementById('expenseDate').value || todayStr(), type = document.getElementById('expenseType').value;
                 const desc = document.getElementById('expenseDescription').value.trim(), amt = parseInt(document.getElementById('expenseAmount').value) || 0;
                 if (!desc) { alert('Enter description'); return; } if (amt <= 0) { alert('Enter valid amount'); return; }
                 db.expenses.push({ id: 'exp_' + Date.now(), date, type, description: desc, amount: amt, recordedAt: new Date().toISOString() });
@@ -1194,7 +1020,7 @@
                 const btn = e.target.closest('[data-remove-expense]'); if (!btn) return;
                 const idx = parseInt(btn.getAttribute('data-remove-expense'));
                 if (confirm('Delete this expense?')) {
-                    const from = document.getElementById('expenseFrom').value || '2026-01-10', to = document.getElementById('expenseTo').value || '2026-01-10';
+                    const from = document.getElementById('expenseFrom').value || todayStr(), to = document.getElementById('expenseTo').value || todayStr();
                     const filtered = db.expenses.filter(e => e.date >= from && e.date <= to);
                     const realIdx = db.expenses.indexOf(filtered[idx]);
                     if (realIdx > -1) db.expenses.splice(realIdx, 1);
@@ -1204,8 +1030,134 @@
             document.getElementById('btnFilterExpenses').addEventListener('click', loadExpenses);
         }
 
+        // ================ DEBTS ================
+        function renderDebts() {
+            const filter = document.getElementById('debtFilter').value;
+            const from = document.getElementById('debtFrom').value || todayStr();
+            const to = document.getElementById('debtTo').value || todayStr();
+            let filtered = db.debts.filter(d => d.date >= from && d.date <= to);
+            if (filter === 'paid') filtered = filtered.filter(d => d.status === 'paid');
+            else if (filter === 'unpaid') filtered = filtered.filter(d => d.status === 'unpaid');
+            else if (filter === 'partial') filtered = filtered.filter(d => d.status === 'partial');
+            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            const tbody = document.querySelector('#debtsTable tbody');
+            if (tbody) {
+                tbody.innerHTML = filtered.map((d, idx) => {
+                    const balance = d.amount - d.paidAmount;
+                    const statusClass = d.status === 'paid' ? 'paid' : d.status === 'partial' ? 'partial' : 'unpaid';
+                    const statusLabel = d.status === 'paid' ? '✅ Paid' : d.status === 'partial' ? '⚠️ Partial' : '❌ Unpaid';
+                    return `<tr>
+                        <td>${d.date}</td>
+                        <td><strong>${d.customer}</strong></td>
+                        <td>${UGX(d.amount)}</td>
+                        <td>${UGX(d.paidAmount)}</td>
+                        <td>${UGX(balance)}</td>
+                        <td><span class="pill ${statusClass}">${statusLabel}</span></td>
+                        <td>${d.dueDate || '-'}</td>
+                        <td class="no-print">
+                            ${d.status !== 'paid' ? `<button class="btn ok" data-pay-debt="${idx}">Pay</button>` : ''}
+                            <button class="btn bad" data-remove-debt="${idx}">×</button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Update debt payment dropdown
+            const select = document.getElementById('debtPaymentSelect');
+            const unpaid = db.debts.filter(d => d.status !== 'paid');
+            select.innerHTML = '<option value="">Select debt to pay</option>' + unpaid.map(d => 
+                `<option value="${d.id}">${d.customer} - ${UGX(d.amount - d.paidAmount)} (${d.date})</option>`
+            ).join('');
+
+            // Total outstanding
+            let outstanding = 0;
+            db.debts.forEach(d => { if (d.status !== 'paid') outstanding += (d.amount - d.paidAmount); });
+            document.getElementById('totalOutstanding').textContent = UGX(outstanding);
+        }
+
+        function setupDebts() {
+            document.getElementById('btnAddDebt').addEventListener('click', () => {
+                const date = document.getElementById('debtDate').value || todayStr();
+                const customer = document.getElementById('debtCustomer').value.trim();
+                const amount = parseInt(document.getElementById('debtAmount').value) || 0;
+                const dueDate = document.getElementById('debtDueDate').value || '';
+                const description = document.getElementById('debtDescription').value.trim() || '';
+                if (!customer) { alert('Enter customer name'); return; }
+                if (amount <= 0) { alert('Enter valid amount'); return; }
+                db.debts.push({
+                    id: 'debt_' + Date.now(),
+                    date, customer, amount, paidAmount: 0,
+                    dueDate, description, status: 'unpaid',
+                    recordedAt: new Date().toISOString()
+                });
+                saveData(); renderDebts(); updateDashboardStats();
+                alert('Debt recorded successfully!');
+                document.getElementById('debtCustomer').value = '';
+                document.getElementById('debtAmount').value = '0';
+                document.getElementById('debtDescription').value = '';
+            });
+
+            document.getElementById('btnRecordPayment').addEventListener('click', () => {
+                const debtId = document.getElementById('debtPaymentSelect').value;
+                if (!debtId) { alert('Select a debt to pay'); return; }
+                const payment = parseInt(prompt('Enter payment amount (UGX):')) || 0;
+                if (payment <= 0) { alert('Enter valid payment amount'); return; }
+                const debt = db.debts.find(d => d.id === debtId);
+                if (!debt) { alert('Debt not found'); return; }
+                const balance = debt.amount - debt.paidAmount;
+                if (payment > balance) {
+                    if (!confirm(`Payment (${UGX(payment)}) exceeds balance (${UGX(balance)}). Apply as overpayment?`)) return;
+                }
+                debt.paidAmount += payment;
+                if (debt.paidAmount >= debt.amount) debt.status = 'paid';
+                else if (debt.paidAmount > 0) debt.status = 'partial';
+                saveData(); renderDebts(); updateDashboardStats();
+                alert(`Payment of ${UGX(payment)} recorded. Remaining: ${UGX(debt.amount - debt.paidAmount)}`);
+            });
+
+            document.getElementById('debtsTable').addEventListener('click', (e) => {
+                const payBtn = e.target.closest('[data-pay-debt]');
+                if (payBtn) {
+                    const idx = parseInt(payBtn.getAttribute('data-pay-debt'));
+                    const from = document.getElementById('debtFrom').value || todayStr();
+                    const to = document.getElementById('debtTo').value || todayStr();
+                    const filtered = db.debts.filter(d => d.date >= from && d.date <= to);
+                    const debt = filtered[idx];
+                    if (!debt) return;
+                    const payment = parseInt(prompt(`Enter payment for ${debt.customer} (Balance: ${UGX(debt.amount - debt.paidAmount)}):`)) || 0;
+                    if (payment <= 0) return;
+                    const balance = debt.amount - debt.paidAmount;
+                    const realDebt = db.debts.find(d => d.id === debt.id);
+                    if (realDebt) {
+                        realDebt.paidAmount += Math.min(payment, balance);
+                        if (realDebt.paidAmount >= realDebt.amount) realDebt.status = 'paid';
+                        else if (realDebt.paidAmount > 0) realDebt.status = 'partial';
+                        saveData(); renderDebts(); updateDashboardStats();
+                        alert('Payment recorded!');
+                    }
+                    return;
+                }
+                const btn = e.target.closest('[data-remove-debt]');
+                if (!btn) return;
+                if (confirm('Delete this debt record?')) {
+                    const idx = parseInt(btn.getAttribute('data-remove-debt'));
+                    const from = document.getElementById('debtFrom').value || todayStr();
+                    const to = document.getElementById('debtTo').value || todayStr();
+                    const filtered = db.debts.filter(d => d.date >= from && d.date <= to);
+                    const realIdx = db.debts.indexOf(filtered[idx]);
+                    if (realIdx > -1) db.debts.splice(realIdx, 1);
+                    saveData(); renderDebts(); updateDashboardStats();
+                }
+            });
+
+            document.getElementById('debtFilter').addEventListener('change', renderDebts);
+            document.getElementById('debtFrom').addEventListener('change', renderDebts);
+            document.getElementById('debtTo').addEventListener('change', renderDebts);
+        }
+
         // ================ REPORTS ================
-        function initReports() { document.getElementById('reportStart').value = '2026-01-10'; document.getElementById('reportEnd').value = '2026-01-10'; }
+        function initReports() { document.getElementById('reportStart').value = todayStr(); document.getElementById('reportEnd').value = todayStr(); }
         function generateReport() {
             const start = document.getElementById('reportStart').value, end = document.getElementById('reportEnd').value;
             if (!start || !end) { alert('Select report period'); return; }
@@ -1226,9 +1178,14 @@
             const netProfit = totalProfit - totalExpenses;
             const margin = totalSales > 0 ? (totalProfit / totalSales * 100).toFixed(1) : 0;
             const netMargin = totalSales > 0 ? (netProfit / totalSales * 100).toFixed(1) : 0;
-            let html = `<div class="grid-4"><div class="stat"><span class="muted">Report Period</span><b>${start} to ${end}</b></div><div class="stat"><span class="muted">Total Sales</span><b>${UGX(totalSales)}</b></div><div class="stat"><span class="muted">Gross Profit</span><b style="color:${totalProfit>=0?'#16a34a':'#ef4444'}">${UGX(totalProfit)}</b></div><div class="stat"><span class="muted">Profit Margin</span><b>${margin}%</b></div></div>
-            <div class="grid-3" style="margin-top:16px;"><div class="stat"><span class="muted">Total Expenses</span><b>${UGX(totalExpenses)}</b></div><div class="stat"><span class="muted">Net Profit/Loss</span><b style="color:${netProfit>=0?'#16a34a':'#ef4444'}">${UGX(netProfit)}</b></div><div class="stat ${netProfit>=0?'goodmsg':'badmsg'}"><span class="muted">Net Profit Margin</span><b>${netMargin}%</b></div></div>
-            <div class="hr"></div><h4>Category Breakdown</h4><table class="table" style="margin-bottom:20px;"><thead><tr><th>Category</th><th>Items Sold</th><th>Total Sales</th><th>Gross Profit</th><th>Profit Margin</th></tr></thead><tbody>`;
+            let html = `<div class="grid-4"><div class="stat"><span class="muted">Report Period</span><b>${start} to ${end}</b></div>
+                <div class="stat"><span class="muted">Total Sales</span><b>${UGX(totalSales)}</b></div>
+                <div class="stat"><span class="muted">Gross Profit</span><b style="color:${totalProfit>=0?'#16a34a':'#ef4444'}">${UGX(totalProfit)}</b></div>
+                <div class="stat"><span class="muted">Profit Margin</span><b>${margin}%</b></div></div>
+                <div class="grid-3" style="margin-top:16px;"><div class="stat"><span class="muted">Total Expenses</span><b>${UGX(totalExpenses)}</b></div>
+                <div class="stat"><span class="muted">Net Profit/Loss</span><b style="color:${netProfit>=0?'#16a34a':'#ef4444'}">${UGX(netProfit)}</b></div>
+                <div class="stat ${netProfit>=0?'goodmsg':'badmsg'}"><span class="muted">Net Profit Margin</span><b>${netMargin}%</b></div></div>
+                <div class="hr"></div><h4>Category Breakdown</h4><table class="table"><thead><tr><th>Category</th><th>Items Sold</th><th>Total Sales</th><th>Gross Profit</th><th>Profit Margin</th></tr></thead><tbody>`;
             for (const [cat, data] of Object.entries(catBreak)) {
                 const cm = data.sales > 0 ? (data.profit / data.sales * 100).toFixed(1) : 0;
                 html += `<tr><td><strong>${cat}</strong></td><td>${data.items}</td><td>${UGX(data.sales)}</td><td><span style="color:${data.profit>=0?'#16a34a':'#ef4444'}">${UGX(data.profit)}</span></td><td>${cm}%</td></tr>`;
@@ -1276,6 +1233,45 @@
             });
         }
 
+        // ================ EMAIL BACKUP ================
+        function setupEmailBackup() {
+            document.getElementById('btnEmailBackup').addEventListener('click', () => {
+                const email = document.getElementById('emailBackupAddress').value.trim();
+                if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
+                const data = JSON.stringify(db, null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
+                const file = new File([blob], `orji-backup-${todayStr()}.json`, { type: 'application/json' });
+                const formData = new FormData();
+                formData.append('to', email);
+                formData.append('subject', `Orji Supplies Backup - ${todayStr()}`);
+                formData.append('body', `Orji Supplies Management System Backup\nDate: ${new Date().toLocaleString()}\nProducts: ${db.products.length}\nSales Records: ${Object.keys(db.dailySheets).length}\nPurchases: ${db.purchases.length}\nExpenses: ${db.expenses.length}\nDebts: ${db.debts.length}\n\nAttached is the complete backup file.`);
+                formData.append('file', file);
+                // Use a free email sending service (this is a demo - in production use a proper backend)
+                // For demo, we'll download the file and show instructions
+                download(`orji-backup-${todayStr()}.json`, blob);
+                alert(`Backup file downloaded. Please email it to ${email} manually.\n\nIn production, this would send automatically via a backend service.`);
+                document.getElementById('emailStatus').textContent = `✅ Backup downloaded for ${email}`;
+            });
+
+            document.getElementById('emailRestoreFile').addEventListener('change', function(e) {
+                const file = e.target.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        const data = JSON.parse(ev.target.result);
+                        if (confirm('Restore this data from email backup? Current data will be replaced.')) {
+                            db = data;
+                            saveData();
+                            document.getElementById('emailStatus').textContent = `✅ Restored from ${file.name}`;
+                            location.reload();
+                        }
+                    } catch (err) { alert('Error restoring: ' + err.message); }
+                };
+                reader.readAsText(file);
+                this.value = '';
+            });
+        }
+
         // ================ DATA SECTION ================
         function renderDataSection() { updateLastSaveTime(); }
         function setupDataManagement() {
@@ -1287,58 +1283,42 @@
                 reader.onload = function(ev) { try { const nd = JSON.parse(ev.target.result); if (confirm('Restore this data? Current data will be replaced.')) { db = nd; saveData(); location.reload(); } } catch (err) { alert('Error restoring: ' + err.message); } };
                 reader.readAsText(file); this.value = '';
             });
-            document.getElementById('btnExportAllData').addEventListener('click', () => {
-                try {
-                    const wb = XLSX.utils.book_new();
-                    const prodData = db.products.map(p => ({ 'Name': p.name, 'Category': p.category, 'Purchase Price': p.purchasePrice, 'Sale Price': p.salePrice, 'Opening Stock': p.openingStock, 'Current Stock': p.currentStock || p.openingStock, 'Sold Count': p.soldCount || 0, 'Total Profit': p.totalProfit || 0, 'Min Stock Level': p.minStockLevel || 10 }));
-                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(prodData), 'Products');
-                    const purData = db.purchases.map(p => ({ 'Date': p.date, 'Product': p.productName, 'Quantity': p.quantity, 'Unit Cost': p.unitCost, 'Total Cost': p.quantity * p.unitCost }));
-                    if (purData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(purData), 'Purchases');
-                    const dailyData = [];
-                    for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                        dailyData.push({ 'Date': date, 'Items Count': sheet.items.length, 'Total Sales': sheet.totalSales || 0, 'Total Profit': sheet.totalProfit || 0, 'Source': sheet.source || 'manual', 'Recorded At': sheet.recordedAt ? new Date(sheet.recordedAt).toLocaleString() : '' });
-                    }
-                    if (dailyData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dailyData), 'Daily Sales');
-                    if (db.expenses.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.expenses), 'Expenses');
-                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-                    function s2ab(s) { const buf = new ArrayBuffer(s.length); const v = new Uint8Array(buf); for (let i=0; i<s.length; i++) v[i] = s.charCodeAt(i) & 0xFF; return buf; }
-                    download(`orji-data-${todayStr()}.xlsx`, new Blob([s2ab(wbout)], { type: "application/octet-stream" }));
-                    alert('All data exported!');
-                } catch (err) { alert('Export error: ' + err.message); }
-            });
-            document.getElementById('btnExportProfitLoss').addEventListener('click', () => {
-                const from = document.getElementById('exportFrom').value || '2026-01-10', to = document.getElementById('exportTo').value || '2026-01-10';
-                let totalSales = 0, totalProfit = 0, totalExpenses = 0;
-                for (const [date, sheet] of Object.entries(db.dailySheets)) { if (date >= from && date <= to) { totalSales += sheet.totalSales || 0; totalProfit += sheet.totalProfit || 0; } }
-                db.expenses.forEach(e => { if (e.date >= from && e.date <= to) totalExpenses += e.amount || 0; });
-                const netProfit = totalProfit - totalExpenses; const margin = totalSales > 0 ? (totalProfit / totalSales * 100).toFixed(1) : 0;
-                const data = [
-                    ["ORJI SUPPLIES - PROFIT & LOSS REPORT"], ["Period:", `${from} to ${to}`], ["Generated:", new Date().toLocaleString()], [],
-                    ["Total Sales", "Total Expenses", "Gross Profit", "Net Profit", "Profit Margin"],
-                    [UGX(totalSales).replace('UGX','').trim(), UGX(totalExpenses).replace('UGX','').trim(), UGX(totalProfit).replace('UGX','').trim(), UGX(netProfit).replace('UGX','').trim(), `${margin}%`]
-                ];
-                const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "P&L");
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-                function s2ab(s) { const buf = new ArrayBuffer(s.length); const v = new Uint8Array(buf); for (let i=0; i<s.length; i++) v[i] = s.charCodeAt(i) & 0xFF; return buf; }
-                download(`pnl-${from}-to-${to}.xlsx`, new Blob([s2ab(wbout)], { type: "application/octet-stream" }));
-            });
 
+            // Danger zone
             document.getElementById('btnWipe').addEventListener('click', () => { if (confirm('ARE YOU SURE? This deletes ALL data and cannot be undone!')) { localStorage.removeItem(STORAGE_KEY); location.reload(); } });
             document.getElementById('btnClearSheets').addEventListener('click', () => { if (confirm('Clear all sales records? Cannot be undone!')) { db.dailySheets = {}; saveData(); renderSales(); renderProducts(); updateDashboardStats(); alert('Sales records cleared!'); } });
             document.getElementById('btnClearPurchases').addEventListener('click', () => {
-                if (confirm('Clear all purchase records? This will also reset stock levels to opening stock (unless adjusted by sales). Cannot be undone!')) {
-                    // Reset current stock to opening stock for all products
+                if (confirm('Clear all purchase records? This will also reset stock levels to opening stock. Cannot be undone!')) {
                     db.products.forEach(p => { p.currentStock = p.openingStock || 0; });
                     db.purchases = [];
-                    saveData();
-                    renderPurchases();
-                    renderProducts();
-                    renderInventory();
-                    updateDashboardStats();
+                    saveData(); renderPurchases(); renderProducts(); renderInventory(); updateDashboardStats();
                     alert('Purchases cleared and stock reset to opening levels.');
                 }
             });
             document.getElementById('btnClearExpenses').addEventListener('click', () => { if (confirm('Clear all expenses? Cannot be undone!')) { db.expenses = []; saveData(); renderExpenses(); updateDashboardStats(); alert('Expenses cleared!'); } });
+            document.getElementById('btnClearDebts').addEventListener('click', () => { if (confirm('Clear all debts? Cannot be undone!')) { db.debts = []; saveData(); renderDebts(); updateDashboardStats(); alert('Debts cleared!'); } });
+        }
+
+        // ================ PRINT ================
+        function setupPrintFunctionality() {
+            const printBtns = ['btnPrintInventory', 'btnPrintSalesHistory', 'btnPrintPurchases', 'btnPrintExpenses', 'btnPrintReport', 'btnPrintProducts', 'btnPrintDebts'];
+            printBtns.forEach(id => {
+                document.getElementById(id)?.addEventListener('click', () => { preparePrintData(); window.print(); });
+            });
+        }
+        function preparePrintData() {
+            const now = new Date(); const fd = now.toLocaleDateString(); const ft = now.toLocaleTimeString();
+            document.getElementById('printInventoryDate').textContent = document.getElementById('inventoryDate').value || todayStr();
+            const sf = document.getElementById('saleFrom').value || todayStr(), st = document.getElementById('saleTo').value || todayStr();
+            document.getElementById('printSalesPeriod').textContent = `${sf} to ${st}`;
+            const ef = document.getElementById('expenseFrom').value || todayStr(), et = document.getElementById('expenseTo').value || todayStr();
+            document.getElementById('printExpensesPeriod').textContent = `${ef} to ${et}`;
+            const rs = document.getElementById('reportStart').value || todayStr(), re = document.getElementById('reportEnd').value || todayStr();
+            document.getElementById('printReportPeriod').textContent = `${rs} to ${re}`;
+            document.getElementById('printProductsGenerated').textContent = `${fd} ${ft}`;
+            const puf = document.getElementById('purchaseFrom').value || todayStr(), put = document.getElementById('purchaseTo').value || todayStr();
+            document.getElementById('printPurchasePeriod').textContent = `${puf} to ${put}`;
+            document.getElementById('printDebtsGenerated').textContent = `${fd} ${ft}`;
         }
 
         // ================ GOOGLE DRIVE ================
@@ -1402,7 +1382,6 @@
                 const jsonData = JSON.stringify(db, null, 2);
                 const existing = await driveFindBackup();
                 if (existing) await driveUpdateBackup(existing.id, jsonData); else await driveCreateBackup(jsonData);
-                const now = new Date().toISOString(); document.getElementById('lastCloudBackup').textContent = new Date(now).toLocaleString();
                 setCloudStatus(`✓ Saved: ${new Date().toLocaleTimeString()}`, true);
                 btn.textContent = "✓ Saved!"; setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
                 alert("✅ Backup saved to Google Drive!");
@@ -1428,11 +1407,36 @@
             document.getElementById('btnCloudLoad').addEventListener('click', driveLoad);
         }
 
+        // ================ TABS ================
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab'), panels = document.querySelectorAll('.tabpanel');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    panels.forEach(p => p.style.display = 'none');
+                    tab.classList.add('active');
+                    const id = tab.getAttribute('data-tab');
+                    const panel = document.getElementById(id);
+                    if (panel) {
+                        panel.style.display = 'block';
+                        if (id === 'products') renderProducts();
+                        if (id === 'sales') renderSales();
+                        if (id === 'purchases') renderPurchases();
+                        if (id === 'inventory') renderInventory();
+                        if (id === 'expenses') renderExpenses();
+                        if (id === 'debts') renderDebts();
+                        if (id === 'reports') initReports();
+                        if (id === 'dashboard') updateDashboardStats();
+                        if (id === 'data') renderDataSection();
+                    }
+                });
+            });
+        }
+
         // ================ INITIALIZATION ================
         async function initializeApp() {
             initBackground();
-            const defaultDate = '2026-01-10';
-            document.querySelectorAll('input[type="date"]').forEach(input => { if (!input.value) input.value = defaultDate; });
+            setAllDates();
 
             setupTabs();
             setupProducts();
@@ -1440,22 +1444,25 @@
             setupPurchases();
             setupInventory();
             setupExpenses();
+            setupDebts();
             setupReports();
             setupDataManagement();
+            setupEmailBackup();
             setupGoogleDrive();
             setupPrintFunctionality();
 
             await initGoogleDrive();
 
             renderProducts();
+            renderDebts();
             updateDashboardStats();
             updateLastSaveTime();
 
             document.getElementById('periodStart').addEventListener('change', updateDashboardStats);
             document.getElementById('periodEnd').addEventListener('change', updateDashboardStats);
 
-            console.log('Orji Supplies Management System initialized with manual purchases.');
-            console.log(`Products: ${db.products.length}, Purchases: ${db.purchases.length}, Sales records: ${Object.keys(db.dailySheets).length}, Expenses: ${db.expenses.length}`);
+            console.log('Orji Supplies Enhanced Management System initialized.');
+            console.log(`Products: ${db.products.length}, Purchases: ${db.purchases.length}, Sales: ${Object.keys(db.dailySheets).length}, Expenses: ${db.expenses.length}, Debts: ${db.debts.length}`);
         }
 
         document.addEventListener('DOMContentLoaded', initializeApp);
