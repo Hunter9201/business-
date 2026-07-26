@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Orji Supplies - Enhanced Management System</title>
-    <meta name="description" content="Fully functional stock management system with full edit capabilities">
+    <title>Orji Supplies - Real‑Time Management</title>
+    <meta name="description" content="Instant update for sales, expenses, debts, purchases – like products">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -328,7 +328,7 @@
             </div>
         </section>
 
-        <!-- Sales -->
+        <!-- Sales (instant like products) -->
         <section id="sales" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
@@ -368,7 +368,7 @@
             </div>
         </section>
 
-        <!-- Purchases -->
+        <!-- Purchases (instant like products) -->
         <section id="purchases" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
@@ -399,7 +399,7 @@
             </div>
         </section>
 
-        <!-- Expenses -->
+        <!-- Expenses (instant like products) -->
         <section id="expenses" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
@@ -428,7 +428,7 @@
             </div>
         </section>
 
-        <!-- Debts -->
+        <!-- Debts (instant like products) -->
         <section id="debts" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
@@ -911,7 +911,7 @@
             document.getElementById('productSort').addEventListener('change', renderProducts);
         }
 
-        // ================ SALES ================
+        // ================ SALES (instant like products) ================
         let dailySaleItems = [];
         let editingSaleDate = null;
 
@@ -980,7 +980,6 @@
                 const pid = document.getElementById('saleProduct').value, qty = parseInt(document.getElementById('saleQty').value) || 1, price = parseInt(document.getElementById('salePrice').value) || 0;
                 if (!pid) { alert('Select a product'); return; } if (qty <= 0) { alert('Enter valid quantity'); return; } if (price <= 0) { alert('Enter valid price'); return; }
                 const p = db.products.find(x => x.id === pid); if (!p) { alert('Product not found'); return; }
-                // For editing, we don't check stock as it might be a correction
                 if (!editingSaleDate) {
                     const stock = p.currentStock || p.openingStock || 0; 
                     if (stock < qty && !confirm(`Only ${stock} items in stock. Continue?`)) return;
@@ -1000,7 +999,6 @@
                 const customer = document.getElementById('customerName').value.trim() || '';
                 
                 if (editingSaleDate) {
-                    // Remove old sale data from products
                     const oldSheet = db.dailySheets[editingSaleDate];
                     if (oldSheet) {
                         oldSheet.items.forEach(item => {
@@ -1045,7 +1043,7 @@
             document.getElementById('btnFilterSales').addEventListener('click', loadRecentSales);
         }
 
-        // ================ PURCHASES ================
+        // ================ PURCHASES (instant like products) ================
         function renderPurchases() { document.getElementById('purchaseQty').value = '1'; document.getElementById('purchaseUnitCost').value = '0'; loadPurchases(); populateProductSelects(); }
         
         function loadPurchases() {
@@ -1213,7 +1211,7 @@
             });
         }
 
-        // ================ EXPENSES ================
+        // ================ EXPENSES (instant like products) ================
         function renderExpenses() { document.getElementById('expenseDescription').value = ''; document.getElementById('expenseAmount').value = '0'; loadExpenses(); }
         function loadExpenses() {
             const from = document.getElementById('expenseFrom').value || todayStr(), to = document.getElementById('expenseTo').value || todayStr();
@@ -1278,7 +1276,7 @@
             document.getElementById('btnFilterExpenses').addEventListener('click', loadExpenses);
         }
 
-        // ================ DEBTS ================
+        // ================ DEBTS (instant like products) ================
         function renderDebts() {
             const filter = document.getElementById('debtFilter').value;
             const from = document.getElementById('debtFrom').value || todayStr();
