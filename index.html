@@ -228,7 +228,7 @@
             backdrop-filter: blur(10px);
             background: rgba(30,30,30,0.9);
             border-left: 5px solid var(--brand);
-            animation: slideIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
+            animation: slideIn 0.3s ease, fadeOut 0.5s ease 3.2s forwards;
             font-size: 14px;
         }
         .toast.success { border-left-color: var(--ok); background: rgba(22,163,74,0.95); }
@@ -393,8 +393,8 @@
                     <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Sales Report</h3><p>Period: <span id="printSalesPeriod"></span> | Generated: <span id="printSalesGenerated"></span></p><div class="hr"></div></div>
                     <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Sales</h3><button class="btn" id="btnPrintSalesHistory">Print</button></div>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
-                        <div><label>From Date</label><input type="date" id="saleFrom" value="2026-07-18"></div>
-                        <div><label>To Date</label><input type="date" id="saleTo" value="2026-07-18"></div>
+                        <div><label>From Date</label><input type="date" id="saleFrom" value="2020-01-01"></div>
+                        <div><label>To Date</label><input type="date" id="saleTo" value="2030-12-31"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterSales">Filter</button></div>
                     </div>
                     <div><table class="table compact-table" id="salesHistoryTable"><thead><tr><th>Date</th><th>Items Sold</th><th>Total Sales</th><th>Total Profit</th><th>Source</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
@@ -408,8 +408,8 @@
                 <div class="section-tools no-print"><h3 style="margin-right:auto">Product Sales History</h3><button class="btn" id="btnPrintProductHistory">Print</button></div>
                 <div class="grid-3 no-print" style="margin-bottom:16px;">
                     <div><label>Product</label><select id="productHistorySelect"></select></div>
-                    <div><label>From Date</label><input type="date" id="productHistoryFrom" value="2026-07-18"></div>
-                    <div><label>To Date</label><input type="date" id="productHistoryTo" value="2026-07-18"></div>
+                    <div><label>From Date</label><input type="date" id="productHistoryFrom" value="2020-01-01"></div>
+                    <div><label>To Date</label><input type="date" id="productHistoryTo" value="2030-12-31"></div>
                 </div>
                 <div><table class="table compact-table" id="productHistoryTable"><thead><tr><th>Date</th><th>Quantity Sold</th><th>Total Sales</th><th>Total Profit</th><th>Avg Price</th></tr></thead><tbody></tbody></table></div>
                 <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>End of Product Sales History Report</p></div>
@@ -438,8 +438,8 @@
                     <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Purchase History</h3><p>Period: <span id="printPurchasePeriod"></span> | Generated: <span id="printPurchaseGenerated"></span></p><div class="hr"></div></div>
                     <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Purchases</h3><button class="btn" id="btnPrintPurchases">Print</button></div>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
-                        <div><label>From Date</label><input type="date" id="purchaseFrom" value="2026-07-18"></div>
-                        <div><label>To Date</label><input type="date" id="purchaseTo" value="2026-07-18"></div>
+                        <div><label>From Date</label><input type="date" id="purchaseFrom" value="2020-01-01"></div>
+                        <div><label>To Date</label><input type="date" id="purchaseTo" value="2030-12-31"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterPurchases">Filter</button></div>
                     </div>
                     <div><table class="table compact-table" id="purchasesTable"><thead><tr><th>Date</th><th>Product</th><th>Qty</th><th>Unit Cost</th><th>Total Cost</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
@@ -469,8 +469,8 @@
                     <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Expenses Report</h3><p>Period: <span id="printExpensesPeriod"></span> | Generated: <span id="printExpensesGenerated"></span></p><div class="hr"></div></div>
                     <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Expenses</h3><button class="btn" id="btnPrintExpenses">Print</button></div>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
-                        <div><label>From Date</label><input type="date" id="expenseFrom" value="2026-07-18"></div>
-                        <div><label>To Date</label><input type="date" id="expenseTo" value="2026-07-18"></div>
+                        <div><label>From Date</label><input type="date" id="expenseFrom" value="2020-01-01"></div>
+                        <div><label>To Date</label><input type="date" id="expenseTo" value="2030-12-31"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterExpenses">Filter</button></div>
                     </div>
                     <div><table class="table compact-table" id="expensesTable"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Amount</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
@@ -486,8 +486,8 @@
                 <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Profit & Loss Report</h3><p>Period: <span id="printReportPeriod"></span> | Generated: <span id="printReportGenerated"></span></p><div class="hr"></div></div>
                 <div class="section-tools no-print"><h3 style="margin-right:auto">Profit & Loss Report</h3><button class="btn" id="btnPrintReport">Print</button><button class="btn" id="btnExportReport">Export Excel</button></div>
                 <div class="grid-4 no-print">
-                    <div><label>Report Period Start</label><input type="date" id="reportStart" value="2026-07-18"></div>
-                    <div><label>Report Period End</label><input type="date" id="reportEnd" value="2026-07-18"></div>
+                    <div><label>Report Period Start</label><input type="date" id="reportStart" value="2020-01-01"></div>
+                    <div><label>Report Period End</label><input type="date" id="reportEnd" value="2030-12-31"></div>
                     <div><label>Compare With</label><select id="comparePeriod"><option value="none">No Comparison</option><option value="previous">Previous Period</option><option value="same_last_year">Same Period Last Year</option></select></div>
                     <div class="right"><button class="btn primary" id="btnGenerateReport">Generate Report</button></div>
                 </div>
@@ -556,8 +556,8 @@
                         <button class="btn" id="btnExportProfitLoss">Export P&L Report</button>
                     </div>
                     <div class="grid-2" style="margin-top:12px; gap:8px;">
-                        <div><label>Export From</label><input type="date" id="exportFrom" value="2026-07-18"></div>
-                        <div><label>Export To</label><input type="date" id="exportTo" value="2026-07-18"></div>
+                        <div><label>Export From</label><input type="date" id="exportFrom" value="2020-01-01"></div>
+                        <div><label>Export To</label><input type="date" id="exportTo" value="2030-12-31"></div>
                     </div>
                     <p class="help">Export data for specific date ranges.</p>
                 </div>
@@ -593,7 +593,7 @@
 
     <script>
         // ============================================================
-        // UNIFIED SYSTEM – All modules work exactly like Products
+        // ORJI SUPPLIES – FULLY SYNCED CRUD SYSTEM
         // ============================================================
 
         // ---------- TOAST ----------
@@ -613,29 +613,36 @@
             "https://i.postimg.cc/LXHQrsJ1/Whats-App-Image-2026-02-03-at-15-27-13.jpg"
         ];
         let currentBgIndex = 0, bgInterval, bgPaused = false;
+
         function initBackground() {
             for (let i = 0; i < backgroundImages.length; i++) {
                 const slide = document.getElementById(`bg-slide-${i+1}`);
                 if (slide) slide.style.backgroundImage = `url('${backgroundImages[i]}')`;
             }
-            backgroundImages.forEach(src => { const img = new Image(); img.src = src; });
+            backgroundImages.forEach(src => { const img = new Image();
+                img.src = src; });
             startBackgroundRotation();
             setupBackgroundControls();
         }
+
         function startBackgroundRotation() {
             clearInterval(bgInterval);
             if (!bgPaused) bgInterval = setInterval(rotateBackground, 8000);
         }
+
         function rotateBackground() {
-            const slides = document.querySelectorAll('.background-slide'), buttons = document.querySelectorAll('.bg-btn');
+            const slides = document.querySelectorAll('.background-slide'),
+                buttons = document.querySelectorAll('.bg-btn');
             slides.forEach(s => s.classList.remove('active'));
             buttons.forEach(b => b.classList.remove('active'));
             currentBgIndex = (currentBgIndex + 1) % backgroundImages.length;
             slides[currentBgIndex].classList.add('active');
             buttons[currentBgIndex].classList.add('active');
         }
+
         function setBackground(index) {
-            const slides = document.querySelectorAll('.background-slide'), buttons = document.querySelectorAll('.bg-btn');
+            const slides = document.querySelectorAll('.background-slide'),
+                buttons = document.querySelectorAll('.bg-btn');
             slides.forEach(s => s.classList.remove('active'));
             buttons.forEach(b => b.classList.remove('active'));
             currentBgIndex = index;
@@ -643,23 +650,31 @@
             buttons[currentBgIndex].classList.add('active');
             if (!bgPaused) startBackgroundRotation();
         }
+
         function toggleBackgroundPause() {
             bgPaused = !bgPaused;
             const pauseBtn = document.getElementById('bgPause');
-            if (bgPaused) { clearInterval(bgInterval); pauseBtn.innerHTML = '▶️'; pauseBtn.title = 'Resume Rotation'; }
-            else { startBackgroundRotation(); pauseBtn.innerHTML = '⏸️'; pauseBtn.title = 'Pause Rotation'; }
+            if (bgPaused) { clearInterval(bgInterval);
+                pauseBtn.innerHTML = '▶️';
+                pauseBtn.title = 'Resume Rotation'; } else { startBackgroundRotation();
+                pauseBtn.innerHTML = '⏸️';
+                pauseBtn.title = 'Pause Rotation'; }
         }
+
         function setupBackgroundControls() {
-            document.querySelectorAll('.bg-btn').forEach((btn, index) => btn.addEventListener('click', () => setBackground(index)));
+            document.querySelectorAll('.bg-btn').forEach((btn, index) => btn.addEventListener('click', () => setBackground(
+                index)));
             document.getElementById('bgPause').addEventListener('click', toggleBackgroundPause);
         }
 
         // ---------- UTILITIES ----------
-        const UGX = (v) => new Intl.NumberFormat('en-UG', { style: 'currency', currency: 'UGX', maximumFractionDigits: 0 }).format(v || 0);
+        const UGX = (v) => new Intl.NumberFormat('en-UG', { style: 'currency', currency: 'UGX',
+            maximumFractionDigits: 0 }).format(v || 0);
         const todayStr = () => {
             const d = new Date();
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         };
+
         function download(filename, blob) {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
@@ -669,18 +684,19 @@
             document.body.removeChild(a);
             setTimeout(() => URL.revokeObjectURL(a.href), 1000);
         }
-        function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
         // ---------- DATA ----------
-        const STORAGE_KEY = 'orji_supplies_management_v4';
+        const STORAGE_KEY = 'orji_supplies_management_v5';
         let db = {
             products: [],
             dailySheets: {},
             purchases: [],
             expenses: [],
-            settings: { lastSave: new Date().toISOString(), accountingPeriod: 'monthly', periodStart: '2026-07-18', periodEnd: '2026-07-18' }
+            settings: { lastSave: new Date().toISOString(), accountingPeriod: 'monthly', periodStart: '2026-07-18',
+                periodEnd: '2026-07-18' }
         };
-        try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) { const parsed = JSON.parse(saved); db = parsed; } } catch(e) { console.error('Error loading saved data:', e); }
+        try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) { const parsed = JSON.parse(saved);
+                db = parsed; } } catch (e) { console.error('Error loading saved data:', e); }
 
         function saveData() {
             try {
@@ -688,18 +704,24 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
                 updateLastSaveTime();
                 return true;
-            } catch(e) { console.error('Error saving data:', e); return false; }
+            } catch (e) { console.error('Error saving data:', e); return false; }
         }
+
         function updateLastSaveTime() {
             const el = document.getElementById('lastSaveTime');
-            if (el && db.settings.lastSave) { const d = new Date(db.settings.lastSave); el.textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString(); }
+            if (el && db.settings.lastSave) { const d = new Date(db.settings.lastSave);
+                el.textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString(); }
         }
 
         // ---------- GLOBAL STOCK RECALC ----------
         function recalculateAllStock() {
             db.products.forEach(p => {
-                const totalPurchased = db.purchases.filter(pur => pur.productId === p.id).reduce((sum, pur) => sum + pur.quantity, 0);
-                let totalSold = 0, totalProfit = 0;
+                const totalPurchased = db.purchases
+                    .filter(pur => pur.productId === p.id)
+                    .reduce((sum, pur) => sum + pur.quantity, 0);
+
+                let totalSold = 0;
+                let totalProfit = 0;
                 Object.values(db.dailySheets).forEach(sheet => {
                     sheet.items.forEach(item => {
                         if (item.productId === p.id) {
@@ -708,6 +730,7 @@
                         }
                     });
                 });
+
                 p.currentStock = (p.openingStock || 0) + totalPurchased - totalSold;
                 p.soldCount = totalSold;
                 p.totalProfit = totalProfit;
@@ -722,6 +745,7 @@
             const hue = Math.abs(hash % 360);
             return `hsl(${hue}, 70%, 65%)`;
         }
+
         function getCategoryPillHTML(category) {
             if (!category) return '<span class="pill">Uncategorized</span>';
             const color = getCategoryColor(category);
@@ -730,45 +754,76 @@
 
         // ---------- PRINT ----------
         function setupPrintFunctionality() {
-            document.getElementById('btnPrintInventory').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintSalesHistory').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintProductHistory').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintPurchases').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintExpenses').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintReport').addEventListener('click', () => { preparePrintData(); window.print(); });
-            document.getElementById('btnPrintProducts').addEventListener('click', () => { preparePrintData(); window.print(); });
+            document.getElementById('btnPrintInventory').addEventListener('click', () => { preparePrintData();
+                window.print(); });
+            document.getElementById('btnPrintSalesHistory').addEventListener('click', () => { preparePrintData();
+                window.print(); });
+            document.getElementById('btnPrintProductHistory').addEventListener('click', () => { preparePrintData();
+                window.print(); });
+            document.getElementById('btnPrintPurchases').addEventListener('click', () => { preparePrintData();
+                window.print(); });
+            document.getElementById('btnPrintExpenses').addEventListener('click', () => { preparePrintData();
+                window.print(); });
+            document.getElementById('btnPrintReport').addEventListener('click', () => { preparePrintData();
+                window.print(); });
+            document.getElementById('btnPrintProducts').addEventListener('click', () => { preparePrintData();
+                window.print(); });
         }
+
         function preparePrintData() {
-            const now = new Date(); const fd = now.toLocaleDateString(); const ft = now.toLocaleTimeString();
-            document.getElementById('printInventoryDate').textContent = document.getElementById('inventoryDate').value || '2026-07-18';
+            const now = new Date();
+            const fd = now.toLocaleDateString();
+            const ft = now.toLocaleTimeString();
+            document.getElementById('printInventoryDate').textContent = document.getElementById('inventoryDate').value ||
+                '2026-07-18';
             document.getElementById('printInventoryGenerated').textContent = `${fd} ${ft}`;
-            const sf = document.getElementById('saleFrom').value || '2026-07-18', st = document.getElementById('saleTo').value || '2026-07-18';
+            const sf = document.getElementById('saleFrom').value || '2020-01-01',
+                st = document.getElementById('saleTo').value || '2030-12-31';
             document.getElementById('printSalesPeriod').textContent = `${sf} to ${st}`;
             document.getElementById('printSalesGenerated').textContent = `${fd} ${ft}`;
-            const ps = document.getElementById('productHistorySelect'), pn = ps.options[ps.selectedIndex]?.text || 'All Products';
-            const pf = document.getElementById('productHistoryFrom').value || '2026-07-18', pt = document.getElementById('productHistoryTo').value || '2026-07-18';
-            document.getElementById('printProductName').textContent = pn; document.getElementById('printProductPeriod').textContent = `${pf} to ${pt}`;
-            const ef = document.getElementById('expenseFrom').value || '2026-07-18', et = document.getElementById('expenseTo').value || '2026-07-18';
-            document.getElementById('printExpensesPeriod').textContent = `${ef} to ${et}`; document.getElementById('printExpensesGenerated').textContent = `${fd} ${ft}`;
-            const rs = document.getElementById('reportStart').value || '2026-07-18', re = document.getElementById('reportEnd').value || '2026-07-18';
-            document.getElementById('printReportPeriod').textContent = `${rs} to ${re}`; document.getElementById('printReportGenerated').textContent = `${fd} ${ft}`;
+            const ps = document.getElementById('productHistorySelect'),
+                pn = ps.options[ps.selectedIndex]?.text || 'All Products';
+            const pf = document.getElementById('productHistoryFrom').value || '2020-01-01',
+                pt = document.getElementById('productHistoryTo').value || '2030-12-31';
+            document.getElementById('printProductName').textContent = pn;
+            document.getElementById('printProductPeriod').textContent = `${pf} to ${pt}`;
+            const ef = document.getElementById('expenseFrom').value || '2020-01-01',
+                et = document.getElementById('expenseTo').value || '2030-12-31';
+            document.getElementById('printExpensesPeriod').textContent = `${ef} to ${et}`;
+            document.getElementById('printExpensesGenerated').textContent = `${fd} ${ft}`;
+            const rs = document.getElementById('reportStart').value || '2020-01-01',
+                re = document.getElementById('reportEnd').value || '2030-12-31';
+            document.getElementById('printReportPeriod').textContent = `${rs} to ${re}`;
+            document.getElementById('printReportGenerated').textContent = `${fd} ${ft}`;
             document.getElementById('printProductsGenerated').textContent = `${fd} ${ft}`;
-            const puf = document.getElementById('purchaseFrom').value || '2026-07-18', put = document.getElementById('purchaseTo').value || '2026-07-18';
+            const puf = document.getElementById('purchaseFrom').value || '2020-01-01',
+                put = document.getElementById('purchaseTo').value || '2030-12-31';
             document.getElementById('printPurchasePeriod').textContent = `${puf} to ${put}`;
             document.getElementById('printPurchaseGenerated').textContent = `${fd} ${ft}`;
             updateFormDataForPrint();
         }
+
         function updateFormDataForPrint() {
-            document.getElementById('printExpenseFormDate').textContent = document.getElementById('expenseDate').value || '2026-07-18';
-            document.getElementById('printExpenseFormType').textContent = document.getElementById('expenseType').value || 'rent';
-            document.getElementById('printExpenseFormAmount').textContent = UGX(parseInt(document.getElementById('expenseAmount').value) || 0);
-            document.getElementById('printExpenseFormDescription').textContent = document.getElementById('expenseDescription').value || 'No description provided';
-            document.getElementById('printProductFormName').textContent = document.getElementById('productName').value || 'N/A';
-            document.getElementById('printProductFormCategory').textContent = document.getElementById('productCategory').value || 'N/A';
-            document.getElementById('printProductFormCost').textContent = UGX(parseInt(document.getElementById('productCost').value) || 0);
-            document.getElementById('printProductFormPrice').textContent = UGX(parseInt(document.getElementById('productPrice').value) || 0);
-            document.getElementById('printProductFormOpening').textContent = document.getElementById('productOpeningStock').value || '0';
-            document.getElementById('printProductFormMinStock').textContent = document.getElementById('productMinStock').value || '10';
+            document.getElementById('printExpenseFormDate').textContent = document.getElementById('expenseDate').value ||
+                '2026-07-18';
+            document.getElementById('printExpenseFormType').textContent = document.getElementById('expenseType').value ||
+                'rent';
+            document.getElementById('printExpenseFormAmount').textContent = UGX(parseInt(document.getElementById(
+                'expenseAmount').value) || 0);
+            document.getElementById('printExpenseFormDescription').textContent = document.getElementById(
+                'expenseDescription').value || 'No description provided';
+            document.getElementById('printProductFormName').textContent = document.getElementById('productName').value ||
+                'N/A';
+            document.getElementById('printProductFormCategory').textContent = document.getElementById('productCategory')
+                .value || 'N/A';
+            document.getElementById('printProductFormCost').textContent = UGX(parseInt(document.getElementById(
+                'productCost').value) || 0);
+            document.getElementById('printProductFormPrice').textContent = UGX(parseInt(document.getElementById(
+                'productPrice').value) || 0);
+            document.getElementById('printProductFormOpening').textContent = document.getElementById(
+                'productOpeningStock').value || '0';
+            document.getElementById('printProductFormMinStock').textContent = document.getElementById(
+                'productMinStock').value || '10';
         }
 
         // ---------- DASHBOARD ----------
@@ -780,13 +835,18 @@
             document.getElementById('statMonthPurchases').textContent = UGX(totalPurchaseCost);
 
             const catSales = {};
-            db.products.forEach(p => { const c = p.category || 'Other'; catSales[c] = (catSales[c] || 0) + (p.soldCount || 0); });
-            let mCat = '-', mMax = 0;
-            for (const [c, s] of Object.entries(catSales)) { if (s > mMax) { mMax = s; mCat = c; } }
+            db.products.forEach(p => { const c = p.category || 'Other';
+                catSales[c] = (catSales[c] || 0) + (p.soldCount || 0); });
+            let mCat = '-',
+                mMax = 0;
+            for (const [c, s] of Object.entries(catSales)) { if (s > mMax) { mMax = s;
+                    mCat = c; } }
             document.getElementById('statMostMoving').textContent = `${mCat} (${mMax} units)`;
 
-            const ps = document.getElementById('periodStart').value || '2026-07-18', pe = document.getElementById('periodEnd').value || '2026-07-18';
-            let grossProfit = 0, totalExpenses = 0;
+            const ps = document.getElementById('periodStart').value || '2026-07-18',
+                pe = document.getElementById('periodEnd').value || '2026-07-18';
+            let grossProfit = 0,
+                totalExpenses = 0;
             Object.values(db.dailySheets).forEach(sheet => {
                 if (sheet.date >= ps && sheet.date <= pe) grossProfit += sheet.totalProfit || 0;
             });
@@ -800,7 +860,8 @@
             document.getElementById('statNetProfit').textContent = UGX(netProfit);
             const statusEl = document.getElementById('profitStatus');
             if (netProfit > 0) {
-                statusEl.innerHTML = `<strong>✅ PROFITABLE:</strong> Net profit of ${UGX(netProfit)} (${margin}% margin)`;
+                statusEl.innerHTML =
+                    `<strong>✅ PROFITABLE:</strong> Net profit of ${UGX(netProfit)} (${margin}% margin)`;
                 statusEl.className = 'goodmsg';
             } else if (netProfit < 0) {
                 statusEl.innerHTML = `<strong>⚠️ LOSS MAKING:</strong> Net loss of ${UGX(Math.abs(netProfit))}`;
@@ -811,17 +872,22 @@
             }
             updateTopProductsList();
         }
+
         function updateTopProductsList() {
-            const top = [...db.products].filter(p => p.soldCount > 0).sort((a,b) => (b.soldCount||0) - (a.soldCount||0)).slice(0,5);
+            const top = [...db.products].filter(p => p.soldCount > 0).sort((a, b) => (b.soldCount || 0) - (a.soldCount ||
+                0)).slice(0, 5);
             const el = document.getElementById('topProductsList');
             if (!el) return;
             if (top.length === 0) el.innerHTML = '<div class="muted">No sales data yet.</div>';
-            else el.innerHTML = top.map(p => `<div class="data-row"><div><strong>${p.name}</strong> ${getCategoryPillHTML(p.category)}</div><div><span class="profit-positive">${p.soldCount} sold</span><div class="muted" style="font-size:12px;">${UGX(p.totalProfit || 0)} profit</div></div></div>`).join('');
+            else el.innerHTML = top.map(p =>
+                `<div class="data-row"><div><strong>${p.name}</strong> ${getCategoryPillHTML(p.category)}</div><div><span class="profit-positive">${p.soldCount} sold</span><div class="muted" style="font-size:12px;">${UGX(p.totalProfit || 0)} profit</div></div></div>`
+                ).join('');
         }
 
         // ---------- TABS ----------
         function setupTabs() {
-            const tabs = document.querySelectorAll('.tab'), panels = document.querySelectorAll('.tabpanel');
+            const tabs = document.querySelectorAll('.tab'),
+                panels = document.querySelectorAll('.tabpanel');
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     tabs.forEach(t => t.classList.remove('active'));
@@ -844,18 +910,20 @@
         }
 
         // ============================================================
-        // PRODUCTS (Reference Implementation)
+        // PRODUCTS
         // ============================================================
         let editingProductId = null;
+
         function renderProducts() {
             const search = document.getElementById('productSearch').value.toLowerCase();
             const sort = document.getElementById('productSort').value;
             let filtered = [...db.products];
-            if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || (p.category||'').toLowerCase().includes(search));
-            filtered.sort((a,b) => {
+            if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || (p.category || '')
+                .toLowerCase().includes(search));
+            filtered.sort((a, b) => {
                 if (sort === 'name') return a.name.localeCompare(b.name);
-                if (sort === 'category') return (a.category||'').localeCompare(b.category||'');
-                if (sort === 'stock') return (b.currentStock||0) - (a.currentStock||0);
+                if (sort === 'category') return (a.category || '').localeCompare(b.category || '');
+                if (sort === 'stock') return (b.currentStock || 0) - (a.currentStock || 0);
                 if (sort === 'profit') {
                     const ma = a.purchasePrice > 0 ? ((a.salePrice - a.purchasePrice) / a.purchasePrice * 100) : 0;
                     const mb = b.purchasePrice > 0 ? ((b.salePrice - b.purchasePrice) / b.purchasePrice * 100) : 0;
@@ -866,8 +934,9 @@
             const tbody = document.querySelector('#productsTable tbody');
             if (tbody) {
                 tbody.innerHTML = filtered.map(p => {
-                    const margin = p.purchasePrice > 0 ? ((p.salePrice - p.purchasePrice) / p.purchasePrice * 100).toFixed(1) : 0;
-                    const low = (p.currentStock||0) <= (p.minStockLevel||5);
+                    const margin = p.purchasePrice > 0 ? ((p.salePrice - p.purchasePrice) / p.purchasePrice *
+                        100).toFixed(1) : 0;
+                    const low = (p.currentStock || 0) <= (p.minStockLevel || 5);
                     const ppu = p.salePrice - p.purchasePrice;
                     return `<tr ${low?'class="highlight"':''}>
                         <td><strong>${p.name}</strong></td>
@@ -895,27 +964,39 @@
             const cats = new Set(db.products.map(p => p.category).filter(c => c));
             const currentVal = select.value;
             select.innerHTML = '<option value="">All Categories</option>';
-            cats.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; select.appendChild(opt); });
+            cats.forEach(c => { const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                select.appendChild(opt); });
             if (currentVal) select.value = currentVal;
         }
+
         function updateCategorySuggestions() {
             const datalist = document.getElementById('categorySuggestions');
             const cats = new Set(db.products.map(p => p.category).filter(c => c));
             datalist.innerHTML = '';
-            cats.forEach(c => { const opt = document.createElement('option'); opt.value = c; datalist.appendChild(opt); });
+            cats.forEach(c => { const opt = document.createElement('option');
+                opt.value = c;
+                datalist.appendChild(opt); });
         }
+
         function populateProductSelects() {
-            const saleSel = document.getElementById('saleProduct'), histSel = document.getElementById('productHistorySelect'), purSel = document.getElementById('purchaseProduct');
-            const list = '<option value="">Select Product</option>' + db.products.map(p => `<option value="${p.id}">${p.name} (Stock: ${p.currentStock||p.openingStock||0})</option>`).join('');
+            const saleSel = document.getElementById('saleProduct'),
+                histSel = document.getElementById('productHistorySelect'),
+                purSel = document.getElementById('purchaseProduct');
+            const list = '<option value="">Select Product</option>' + db.products.map(p =>
+                `<option value="${p.id}">${p.name} (Stock: ${p.currentStock||p.openingStock||0})</option>`).join('');
             if (saleSel) {
-                saleSel.innerHTML = '<option value="">Select Product</option>' + db.products.map(p => `<option value="${p.id}" data-price="${p.salePrice}">${p.name} (Stock: ${p.currentStock||p.openingStock||0}) - ${UGX(p.salePrice||0)}</option>`).join('');
+                saleSel.innerHTML = '<option value="">Select Product</option>' + db.products.map(p =>
+                    `<option value="${p.id}" data-price="${p.salePrice}">${p.name} (Stock: ${p.currentStock||p.openingStock||0}) - ${UGX(p.salePrice||0)}</option>`
+                    ).join('');
             }
-            if (histSel) histSel.innerHTML = '<option value="">Select Product</option>' + db.products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            if (histSel) histSel.innerHTML = '<option value="">Select Product</option>' + db.products.map(p =>
+                `<option value="${p.id}">${p.name}</option>`).join('');
             if (purSel) purSel.innerHTML = list;
         }
 
         function setupProducts() {
-            // Edit button
             document.getElementById('productsTable').addEventListener('click', (e) => {
                 const editBtn = e.target.closest('[data-edit-product]');
                 if (editBtn) {
@@ -934,21 +1015,21 @@
                     showToast('Loaded product for editing', 'warning');
                     return;
                 }
-
-                // Delete button
                 const delBtn = e.target.closest('[data-delete-product]');
                 if (delBtn) {
                     const id = delBtn.getAttribute('data-delete-product');
                     if (!confirm('Delete this product?')) return;
                     db.products = db.products.filter(p => p.id !== id);
-                    if (editingProductId === id) { editingProductId = null; document.getElementById('btnDeleteProduct').disabled = true; }
+                    if (editingProductId === id) { editingProductId = null;
+                        document.getElementById('btnDeleteProduct').disabled = true; }
                     saveData();
-                    renderProducts(); updateDashboardStats(); populateProductSelects();
+                    renderProducts();
+                    updateDashboardStats();
+                    populateProductSelects();
                     showToast('Product deleted.', 'warning');
                 }
             });
 
-            // Save button
             document.getElementById('btnSaveProduct').addEventListener('click', () => {
                 const name = document.getElementById('productName').value.trim();
                 if (!name) { showToast('Please enter product name', 'error'); return; }
@@ -960,24 +1041,44 @@
                 if (editingProductId) {
                     const p = db.products.find(x => x.id === editingProductId);
                     if (p) {
-                        p.name = name; p.category = cat; p.purchasePrice = cost; p.salePrice = price;
-                        p.openingStock = opening; p.minStockLevel = min;
+                        p.name = name;
+                        p.category = cat;
+                        p.purchasePrice = cost;
+                        p.salePrice = price;
+                        p.openingStock = opening;
+                        p.minStockLevel = min;
                         if (p.currentStock === undefined) p.currentStock = opening;
                         recalculateAllStock();
                     }
                     showToast('Product updated!', 'success');
                 } else {
-                    db.products.push({ id: 'prod_' + Date.now(), name, category: cat, purchasePrice: cost, salePrice: price, openingStock: opening, currentStock: opening, minStockLevel: min, soldCount: 0, totalProfit: 0 });
+                    db.products.push({
+                        id: 'prod_' + Date.now(),
+                        name,
+                        category: cat,
+                        purchasePrice: cost,
+                        salePrice: price,
+                        openingStock: opening,
+                        currentStock: opening,
+                        minStockLevel: min,
+                        soldCount: 0,
+                        totalProfit: 0
+                    });
                     recalculateAllStock();
                     showToast('Product saved!', 'success');
                 }
                 saveData();
-                renderProducts(); updateDashboardStats(); populateProductSelects();
-                // Reset form
-                document.getElementById('productName').value = ''; document.getElementById('productCategory').value = '';
-                document.getElementById('productCost').value = '0'; document.getElementById('productPrice').value = '0';
-                document.getElementById('productOpeningStock').value = '0'; document.getElementById('productMinStock').value = '10';
-                document.getElementById('btnDeleteProduct').disabled = true; editingProductId = null;
+                renderProducts();
+                updateDashboardStats();
+                populateProductSelects();
+                document.getElementById('productName').value = '';
+                document.getElementById('productCategory').value = '';
+                document.getElementById('productCost').value = '0';
+                document.getElementById('productPrice').value = '0';
+                document.getElementById('productOpeningStock').value = '0';
+                document.getElementById('productMinStock').value = '10';
+                document.getElementById('btnDeleteProduct').disabled = true;
+                editingProductId = null;
             });
 
             document.getElementById('productSearch').addEventListener('input', renderProducts);
@@ -985,7 +1086,7 @@
         }
 
         // ============================================================
-        // SALES (Unified with Products style)
+        // SALES
         // ============================================================
         let dailySaleItems = [];
         let editingSaleDate = null;
@@ -1009,21 +1110,26 @@
             const tbody = document.querySelector('#saleItemsTable tbody');
             if (tbody) tbody.innerHTML = dailySaleItems.map((item, idx) =>
                 `<tr><td>${item.productName}</td><td>${item.quantity}</td><td>${UGX(item.unitPrice)}</td><td>${UGX(item.total)}</td><td><span class="profit-positive">${UGX(item.profit)}</span></td><td class="no-print"><button class="btn bad" data-remove-sale-item="${idx}">×</button></td></tr>`
-            ).join('');
+                ).join('');
         }
 
         function loadRecentSales() {
-            const from = document.getElementById('saleFrom').value || '2026-07-18', to = document.getElementById('saleTo').value || '2026-07-18';
+            const from = document.getElementById('saleFrom').value || '2020-01-01';
+            const to = document.getElementById('saleTo').value || '2030-12-31';
             const filtered = [];
             for (const [date, sheet] of Object.entries(db.dailySheets)) {
                 if (date >= from && date <= to) filtered.push({ date, ...sheet });
             }
-            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
             const tbody = document.querySelector('#salesHistoryTable tbody');
             if (tbody) {
-                tbody.innerHTML = filtered.map(s => {
-                    const itemCount = s.items?.length || 0;
-                    return `<tr>
+                if (filtered.length === 0) {
+                    tbody.innerHTML =
+                        `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No sales found in this date range. Try adjusting the filters.</td></tr>`;
+                } else {
+                    tbody.innerHTML = filtered.map(s => {
+                        const itemCount = s.items?.length || 0;
+                        return `<tr>
                         <td><strong>${s.date}</strong></td>
                         <td>${itemCount} items</td>
                         <td>${UGX(s.totalSales||0)}</td>
@@ -1034,7 +1140,8 @@
                             <button class="btn bad" data-delete-sale="${s.date}">Delete</button>
                         </td>
                     </tr>`;
-                }).join('');
+                    }).join('');
+                }
             }
         }
 
@@ -1054,10 +1161,10 @@
         function setupSales() {
             document.getElementById('saleProduct').addEventListener('change', function() {
                 const opt = this.options[this.selectedIndex];
-                if (opt && opt.value) document.getElementById('salePrice').value = opt.getAttribute('data-price') || '';
+                if (opt && opt.value) document.getElementById('salePrice').value = opt.getAttribute('data-price') ||
+                    '';
             });
 
-            // Add item
             document.getElementById('btnAddSaleItem').addEventListener('click', () => {
                 const pid = document.getElementById('saleProduct').value;
                 const qty = parseInt(document.getElementById('saleQty').value) || 1;
@@ -1071,14 +1178,14 @@
                 if (stock < qty && !confirm(`Only ${stock} items in stock. Continue?`)) return;
                 const total = qty * price;
                 const profit = qty * (price - p.purchasePrice);
-                dailySaleItems.push({ productId: pid, productName: p.name, quantity: qty, unitPrice: price, total, profit });
+                dailySaleItems.push({ productId: pid, productName: p.name, quantity: qty, unitPrice: price, total,
+                    profit });
                 updateDailySaleTotal();
                 document.getElementById('saleQty').value = '1';
                 document.getElementById('salePrice').value = '';
                 showToast(`${qty} x ${p.name} added`);
             });
 
-            // Remove item
             document.getElementById('saleItemsTable').addEventListener('click', (e) => {
                 const btn = e.target.closest('[data-remove-sale-item]');
                 if (!btn) return;
@@ -1087,7 +1194,6 @@
                 updateDailySaleTotal();
             });
 
-            // Table actions (Edit / Delete)
             document.getElementById('salesHistoryTable').addEventListener('click', (e) => {
                 const editBtn = e.target.closest('[data-edit-sale]');
                 if (editBtn) {
@@ -1122,13 +1228,11 @@
                 }
             });
 
-            // Save / Update
             document.getElementById('btnSaveDailySales').addEventListener('click', () => {
                 if (!dailySaleItems.length) { showToast('Add items first', 'error'); return; }
                 const date = document.getElementById('saleDate').value || '2026-07-18';
                 const ref = document.getElementById('sheetReference').value.trim() || 'manual';
 
-                // If editing an existing date (and it's not the same as the new date), reverse old sheet first
                 if (editingSaleDate && editingSaleDate !== date) {
                     const oldSheet = db.dailySheets[editingSaleDate];
                     if (oldSheet) {
@@ -1144,7 +1248,6 @@
                     }
                 }
 
-                // If a sheet exists at the target date (overwrite), reverse it
                 if (db.dailySheets[date]) {
                     const oldSheet = db.dailySheets[date];
                     oldSheet.items.forEach(item => {
@@ -1157,7 +1260,6 @@
                     });
                 }
 
-                // Apply new items
                 const total = dailySaleItems.reduce((s, i) => s + i.total, 0);
                 const profit = dailySaleItems.reduce((s, i) => s + i.profit, 0);
                 dailySaleItems.forEach(item => {
@@ -1194,7 +1296,8 @@
 
         function loadProductHistory() {
             const pid = document.getElementById('productHistorySelect').value;
-            const from = document.getElementById('productHistoryFrom').value, to = document.getElementById('productHistoryTo').value;
+            const from = document.getElementById('productHistoryFrom').value || '2020-01-01';
+            const to = document.getElementById('productHistoryTo').value || '2030-12-31';
             if (!pid) return;
             const p = db.products.find(x => x.id === pid);
             if (!p) return;
@@ -1210,15 +1313,22 @@
                     }
                 }
             }
-            sales.sort((a,b) => new Date(b.date) - new Date(a.date));
+            sales.sort((a, b) => new Date(b.date) - new Date(a.date));
             const tbody = document.querySelector('#productHistoryTable tbody');
-            if (tbody) tbody.innerHTML = sales.map(s =>
-                `<tr><td><strong>${s.date}</strong></td><td>${s.qty}</td><td>${UGX(s.totalSales)}</td><td><span class="profit-positive">${UGX(s.totalProfit)}</span></td><td>${UGX(s.avgPrice)}</td></tr>`
-            ).join('');
+            if (tbody) {
+                if (sales.length === 0) {
+                    tbody.innerHTML =
+                        `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">No sales found for this product in the selected date range.</td></tr>`;
+                } else {
+                    tbody.innerHTML = sales.map(s =>
+                        `<tr><td><strong>${s.date}</strong></td><td>${s.qty}</td><td>${UGX(s.totalSales)}</td><td><span class="profit-positive">${UGX(s.totalProfit)}</span></td><td>${UGX(s.avgPrice)}</td></tr>`
+                        ).join('');
+                }
+            }
         }
 
         // ============================================================
-        // PURCHASES (Unified with Products style)
+        // PURCHASES
         // ============================================================
         let editingPurchaseId = null;
 
@@ -1232,15 +1342,19 @@
         }
 
         function loadPurchases() {
-            const from = document.getElementById('purchaseFrom').value || '2026-07-18';
-            const to = document.getElementById('purchaseTo').value || '2026-07-18';
+            const from = document.getElementById('purchaseFrom').value || '2020-01-01';
+            const to = document.getElementById('purchaseTo').value || '2030-12-31';
             let filtered = db.purchases.filter(p => p.date >= from && p.date <= to);
-            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             const tbody = document.querySelector('#purchasesTable tbody');
             if (tbody) {
-                tbody.innerHTML = filtered.map(p => {
-                    return `<tr>
+                if (filtered.length === 0) {
+                    tbody.innerHTML =
+                        `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No purchases found in this date range.</td></tr>`;
+                } else {
+                    tbody.innerHTML = filtered.map(p => {
+                        return `<tr>
                         <td>${p.date}</td>
                         <td>${p.productName}</td>
                         <td>${p.quantity}</td>
@@ -1251,7 +1365,8 @@
                             <button class="btn bad" data-delete-purchase="${p.id}">Delete</button>
                         </td>
                     </tr>`;
-                }).join('');
+                    }).join('');
+                }
             }
 
             const totalCost = filtered.reduce((sum, p) => sum + (p.quantity * p.unitCost), 0);
@@ -1259,7 +1374,6 @@
         }
 
         function setupPurchases() {
-            // Edit / Delete
             document.getElementById('purchasesTable').addEventListener('click', (e) => {
                 const editBtn = e.target.closest('[data-edit-purchase]');
                 if (editBtn) {
@@ -1282,7 +1396,8 @@
                     const id = delBtn.getAttribute('data-delete-purchase');
                     const purchase = db.purchases.find(p => p.id === id);
                     if (!purchase) return;
-                    if (!confirm(`Delete purchase of ${purchase.quantity} x ${purchase.productName} on ${purchase.date}?`)) return;
+                    if (!confirm(`Delete purchase of ${purchase.quantity} x ${purchase.productName} on ${purchase.date}?`))
+                        return;
                     const product = db.products.find(p => p.id === purchase.productId);
                     if (product) {
                         product.currentStock = Math.max(0, (product.currentStock || 0) - purchase.quantity);
@@ -1299,7 +1414,6 @@
                 }
             });
 
-            // Save / Update
             document.getElementById('btnSavePurchase').addEventListener('click', () => {
                 const pid = document.getElementById('purchaseProduct').value;
                 const qty = parseInt(document.getElementById('purchaseQty').value) || 1;
@@ -1314,16 +1428,15 @@
                 if (!product) { showToast('Product not found', 'error'); return; }
 
                 if (editingPurchaseId) {
-                    // Reverse old
                     const oldPurchase = db.purchases.find(p => p.id === editingPurchaseId);
                     if (oldPurchase) {
                         const oldProduct = db.products.find(x => x.id === oldPurchase.productId);
                         if (oldProduct) {
-                            oldProduct.currentStock = Math.max(0, (oldProduct.currentStock || 0) - oldPurchase.quantity);
+                            oldProduct.currentStock = Math.max(0, (oldProduct.currentStock || 0) - oldPurchase
+                            .quantity);
                         }
                         db.purchases = db.purchases.filter(p => p.id !== editingPurchaseId);
                     }
-                    // Add new
                     const newPurchase = {
                         id: 'pur_' + Date.now(),
                         date,
@@ -1365,7 +1478,7 @@
         }
 
         // ============================================================
-        // EXPENSES (Unified with Products style)
+        // EXPENSES
         // ============================================================
         let editingExpenseId = null;
 
@@ -1378,12 +1491,18 @@
         }
 
         function loadExpenses() {
-            const from = document.getElementById('expenseFrom').value || '2026-07-18', to = document.getElementById('expenseTo').value || '2026-07-18';
-            const filtered = db.expenses.filter(e => e.date >= from && e.date <= to).sort((a,b) => new Date(b.date) - new Date(a.date));
+            const from = document.getElementById('expenseFrom').value || '2020-01-01';
+            const to = document.getElementById('expenseTo').value || '2030-12-31';
+            const filtered = db.expenses.filter(e => e.date >= from && e.date <= to).sort((a, b) => new Date(b.date) -
+                new Date(a.date));
             const tbody = document.querySelector('#expensesTable tbody');
             if (tbody) {
-                tbody.innerHTML = filtered.map(e => {
-                    return `<tr>
+                if (filtered.length === 0) {
+                    tbody.innerHTML =
+                        `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">No expenses found in this date range.</td></tr>`;
+                } else {
+                    tbody.innerHTML = filtered.map(e => {
+                        return `<tr>
                         <td>${e.date}</td>
                         <td><span class="pill">${e.type}</span></td>
                         <td>${e.description||''}</td>
@@ -1393,14 +1512,14 @@
                             <button class="btn bad" data-delete-expense="${e.id}">Delete</button>
                         </td>
                     </tr>`;
-                }).join('');
+                    }).join('');
+                }
             }
             const total = filtered.reduce((s, e) => s + (e.amount || 0), 0);
             document.getElementById('totalExpenses').textContent = UGX(total);
         }
 
         function setupExpenses() {
-            // Edit / Delete
             document.getElementById('expensesTable').addEventListener('click', (e) => {
                 const editBtn = e.target.closest('[data-edit-expense]');
                 if (editBtn) {
@@ -1433,7 +1552,6 @@
                 }
             });
 
-            // Save / Update
             document.getElementById('btnSaveExpense').addEventListener('click', () => {
                 const date = document.getElementById('expenseDate').value || '2026-07-18';
                 const type = document.getElementById('expenseType').value;
@@ -1451,7 +1569,8 @@
                     document.getElementById('btnSaveExpense').textContent = 'Save Expense';
                     showToast('Expense updated!', 'success');
                 } else {
-                    db.expenses.push({ id: 'exp_' + Date.now(), date, type, description: desc, amount: amt, recordedAt: new Date().toISOString() });
+                    db.expenses.push({ id: 'exp_' + Date.now(), date, type, description: desc, amount: amt,
+                        recordedAt: new Date().toISOString() });
                     showToast('Expense saved!');
                 }
                 saveData();
@@ -1463,10 +1582,8 @@
         }
 
         // ============================================================
-        // INVENTORY, REPORTS, DATA, GOOGLE DRIVE, INIT
+        // INVENTORY
         // ============================================================
-
-        // ---------- INVENTORY ----------
         function renderInventory() {
             const date = document.getElementById('inventoryDate').value || '2026-07-18';
             const cat = document.getElementById('filterCategory').value;
@@ -1476,7 +1593,8 @@
             filtered.forEach(p => {
                 const purchases = db.purchases.filter(pur => pur.productId === p.id && pur.date <= date);
                 const totalPurchased = purchases.reduce((sum, pur) => sum + pur.quantity, 0);
-                let sold = 0, profit = 0;
+                let sold = 0,
+                    profit = 0;
                 Object.entries(db.dailySheets).forEach(([d, sheet]) => {
                     if (d <= date) {
                         const items = sheet.items.filter(i => i.productId === p.id);
@@ -1493,9 +1611,13 @@
 
             const tbody = document.querySelector('#inventoryTable tbody');
             if (tbody) {
-                tbody.innerHTML = filtered.map(p => {
-                    const low = p.calcClosing <= (p.minStockLevel || 5);
-                    return `<tr ${low?'class="highlight"':''}>
+                if (filtered.length === 0) {
+                    tbody.innerHTML =
+                        `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px;">No products found. Add some products first.</td></tr>`;
+                } else {
+                    tbody.innerHTML = filtered.map(p => {
+                        const low = p.calcClosing <= (p.minStockLevel || 5);
+                        return `<tr ${low?'class="highlight"':''}>
                         <td><strong>${p.name}</strong></td>
                         <td>${getCategoryPillHTML(p.category)}</td>
                         <td>${p.openingStock||0}</td>
@@ -1507,11 +1629,13 @@
                         <td>${UGX(p.stockValue||0)}</td>
                         <td><span class="profit-positive">${UGX(p.calcProfit||0)}</span></td>
                     </tr>`;
-                }).join('');
-                const totalVal = filtered.reduce((s, p) => s + (p.stockValue || 0), 0);
-                const totalProf = filtered.reduce((s, p) => s + (p.calcProfit || 0), 0);
-                const lowCount = filtered.filter(p => p.calcClosing <= (p.minStockLevel || 5)).length;
-                tbody.innerHTML += `<tr style="background:rgba(248,250,252,0.9);font-weight:bold;"><td colspan="8">Summary: ${filtered.length} products, ${lowCount} low stock</td><td>${UGX(totalVal)}</td><td><span class="profit-positive">${UGX(totalProf)}</span></td></tr>`;
+                    }).join('');
+                    const totalVal = filtered.reduce((s, p) => s + (p.stockValue || 0), 0);
+                    const totalProf = filtered.reduce((s, p) => s + (p.calcProfit || 0), 0);
+                    const lowCount = filtered.filter(p => p.calcClosing <= (p.minStockLevel || 5)).length;
+                    tbody.innerHTML +=
+                        `<tr style="background:rgba(248,250,252,0.9);font-weight:bold;"><td colspan="8">Summary: ${filtered.length} products, ${lowCount} low stock</td><td>${UGX(totalVal)}</td><td><span class="profit-positive">${UGX(totalProf)}</span></td></tr>`;
+                }
             }
         }
 
@@ -1528,7 +1652,8 @@
                 filtered.forEach(p => {
                     const purchases = db.purchases.filter(pur => pur.productId === p.id && pur.date <= date);
                     const totalPurchased = purchases.reduce((sum, pur) => sum + pur.quantity, 0);
-                    let sold = 0, profit = 0;
+                    let sold = 0,
+                        profit = 0;
                     Object.entries(db.dailySheets).forEach(([d, sheet]) => {
                         if (d <= date) {
                             const items = sheet.items.filter(i => i.productId === p.id);
@@ -1536,42 +1661,61 @@
                             profit += items.reduce((s, i) => s + i.profit, 0);
                         }
                     });
-                    p.calcPurchased = totalPurchased; p.calcSold = sold; p.calcProfit = profit;
+                    p.calcPurchased = totalPurchased;
+                    p.calcSold = sold;
+                    p.calcProfit = profit;
                     p.calcClosing = Math.max(0, (p.openingStock || 0) + totalPurchased - sold);
                     p.stockValue = p.calcClosing * (p.purchasePrice || 0);
                 });
-                const headers = ['Product', 'Category', 'Opening', 'Purchased', 'Sold', 'Closing', 'Cost Price', 'Sale Price', 'Stock Value', 'Profit'];
-                const rows = filtered.map(p => [p.name, p.category||'', p.openingStock||0, p.calcPurchased, p.calcSold, p.calcClosing, p.purchasePrice||0, p.salePrice||0, p.stockValue||0, p.calcProfit||0]);
+                const headers = ['Product', 'Category', 'Opening', 'Purchased', 'Sold', 'Closing', 'Cost Price',
+                    'Sale Price', 'Stock Value', 'Profit'
+                ];
+                const rows = filtered.map(p => [p.name, p.category || '', p.openingStock || 0, p.calcPurchased,
+                    p.calcSold, p.calcClosing, p.purchasePrice || 0, p.salePrice || 0, p.stockValue || 0,
+                    p.calcProfit || 0
+                ]);
                 const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
                 download(`inventory-${date}.csv`, new Blob([csv], { type: 'text/csv' }));
             });
         }
 
-        // ---------- REPORTS ----------
+        // ============================================================
+        // REPORTS
+        // ============================================================
         function initReports() {
-            document.getElementById('reportStart').value = '2026-07-18';
-            document.getElementById('reportEnd').value = '2026-07-18';
+            document.getElementById('reportStart').value = '2020-01-01';
+            document.getElementById('reportEnd').value = '2030-12-31';
         }
+
         function generateReport() {
-            const start = document.getElementById('reportStart').value, end = document.getElementById('reportEnd').value;
+            const start = document.getElementById('reportStart').value || '2020-01-01';
+            const end = document.getElementById('reportEnd').value || '2030-12-31';
             if (!start || !end) { showToast('Select report period', 'error'); return; }
-            let totalSales = 0, totalProfit = 0, totalExpenses = 0;
+            let totalSales = 0,
+                totalProfit = 0,
+                totalExpenses = 0;
             const catBreak = {};
             for (const [date, sheet] of Object.entries(db.dailySheets)) {
                 if (date >= start && date <= end) {
-                    totalSales += sheet.totalSales || 0; totalProfit += sheet.totalProfit || 0;
+                    totalSales += sheet.totalSales || 0;
+                    totalProfit += sheet.totalProfit || 0;
                     sheet.items.forEach(item => {
                         const p = db.products.find(x => x.id === item.productId);
                         const cat = p ? p.category || 'Other' : 'Other';
                         if (!catBreak[cat]) catBreak[cat] = { sales: 0, profit: 0, items: 0 };
-                        catBreak[cat].sales += item.total; catBreak[cat].profit += item.profit; catBreak[cat].items += item.quantity;
+                        catBreak[cat].sales += item.total;
+                        catBreak[cat].profit += item.profit;
+                        catBreak[cat].items += item.quantity;
                     });
                 }
             }
-            db.expenses.forEach(e => { if (e.date >= start && e.date <= end) totalExpenses += e.amount || 0; });
+            db.expenses.forEach(e => {
+                if (e.date >= start && e.date <= end) totalExpenses += e.amount || 0;
+            });
             const netProfit = totalProfit - totalExpenses;
             const margin = totalSales > 0 ? (totalProfit / totalSales * 100).toFixed(1) : 0;
             const netMargin = totalSales > 0 ? (netProfit / totalSales * 100).toFixed(1) : 0;
+
             let html =
                 `<div class="grid-4"><div class="stat"><span class="muted">Report Period</span><b>${start} to ${end}</b></div><div class="stat"><span class="muted">Total Sales</span><b>${UGX(totalSales)}</b></div><div class="stat"><span class="muted">Gross Profit</span><b style="color:${totalProfit>=0?'#16a34a':'#ef4444'}">${UGX(totalProfit)}</b></div><div class="stat"><span class="muted">Profit Margin</span><b>${margin}%</b></div></div>
             <div class="grid-3" style="margin-top:16px;"><div class="stat"><span class="muted">Total Expenses</span><b>${UGX(totalExpenses)}</b></div><div class="stat"><span class="muted">Net Profit/Loss</span><b style="color:${netProfit>=0?'#16a34a':'#ef4444'}">${UGX(netProfit)}</b></div><div class="stat ${netProfit>=0?'goodmsg':'badmsg'}"><span class="muted">Net Profit Margin</span><b>${netMargin}%</b></div></div>
@@ -1581,14 +1725,25 @@
                 html +=
                     `<tr><td><strong>${cat}</strong></td><td>${data.items}</td><td>${UGX(data.sales)}</td><td><span style="color:${data.profit>=0?'#16a34a':'#ef4444'}">${UGX(data.profit)}</span></td><td>${cm}%</td></tr>`;
             }
+            if (Object.keys(catBreak).length === 0) {
+                html +=
+                    `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">No sales data in this period.</td></tr>`;
+            }
             html += `</tbody></table><div class="hr"></div><h4>Expenses Breakdown</h4><table class="table"><thead><tr><th>Expense Type</th><th>Count</th><th>Total Amount</th><th>% of Expenses</th></tr></thead><tbody>`;
             const expTypes = {};
-            db.expenses.forEach(e => { if (e.date >= start && e.date <= end) expTypes[e.type] = (expTypes[e.type] || 0) + (e.amount || 0); });
+            db.expenses.forEach(e => {
+                if (e.date >= start && e.date <= end) expTypes[e.type] = (expTypes[e.type] || 0) + (e.amount ||
+                    0);
+            });
             for (const [type, amt] of Object.entries(expTypes)) {
                 const pct = totalExpenses > 0 ? ((amt / totalExpenses) * 100).toFixed(1) : 0;
                 const cnt = db.expenses.filter(e => e.type === type && e.date >= start && e.date <= end).length;
                 html +=
                     `<tr><td><span class="pill">${type}</span></td><td>${cnt}</td><td>${UGX(amt)}</td><td>${pct}%</td></tr>`;
+            }
+            if (Object.keys(expTypes).length === 0) {
+                html +=
+                    `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px;">No expenses in this period.</td></tr>`;
             }
             html += `</tbody></table>`;
             document.getElementById('reportOutput').innerHTML = html;
@@ -1597,13 +1752,21 @@
         function setupReports() {
             document.getElementById('btnGenerateReport').addEventListener('click', generateReport);
             document.getElementById('btnExportReport').addEventListener('click', () => {
-                const start = document.getElementById('reportStart').value, end = document.getElementById('reportEnd').value;
+                const start = document.getElementById('reportStart').value || '2020-01-01';
+                const end = document.getElementById('reportEnd').value || '2030-12-31';
                 if (!start || !end) { showToast('Select report period first', 'error'); return; }
-                let totalSales = 0, totalProfit = 0, totalExpenses = 0;
+                let totalSales = 0,
+                    totalProfit = 0,
+                    totalExpenses = 0;
                 for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                    if (date >= start && date <= end) { totalSales += sheet.totalSales || 0; totalProfit += sheet.totalProfit || 0; }
+                    if (date >= start && date <= end) {
+                        totalSales += sheet.totalSales || 0;
+                        totalProfit += sheet.totalProfit || 0;
+                    }
                 }
-                db.expenses.forEach(e => { if (e.date >= start && e.date <= end) totalExpenses += e.amount || 0; });
+                db.expenses.forEach(e => {
+                    if (e.date >= start && e.date <= end) totalExpenses += e.amount || 0;
+                });
                 const netProfit = totalProfit - totalExpenses;
                 const margin = totalSales > 0 ? (totalProfit / totalSales * 100).toFixed(1) : 0;
                 const data = [
@@ -1623,23 +1786,35 @@
                 ];
                 for (const [date, sheet] of Object.entries(db.dailySheets)) {
                     if (date >= start && date <= end) {
-                        const de = db.expenses.filter(e => e.date === date).reduce((s, e) => s + (e.amount || 0), 0);
+                        const de = db.expenses.filter(e => e.date === date).reduce((s, e) => s + (e.amount || 0),
+                        0);
                         const dn = (sheet.totalProfit || 0) - de;
-                        data.push([date, UGX(sheet.totalSales || 0).replace('UGX', '').trim(), UGX(sheet.totalProfit || 0).replace('UGX', '').trim(), UGX(de).replace('UGX', '').trim(), UGX(dn).replace('UGX', '').trim()]);
+                        data.push([date, UGX(sheet.totalSales || 0).replace('UGX', '').trim(), UGX(sheet
+                            .totalProfit || 0).replace('UGX', '').trim(), UGX(de).replace('UGX', '').trim(),
+                            UGX(dn).replace('UGX', '').trim()
+                        ]);
                     }
                 }
                 const ws = XLSX.utils.aoa_to_sheet(data);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "P&L Report");
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-                function s2ab(s) { const buf = new ArrayBuffer(s.length); const v = new Uint8Array(buf); for (let i=0; i<s.length; i++) v[i] = s.charCodeAt(i) & 0xFF; return buf; }
-                download(`profit-loss-${start}-to-${end}.xlsx`, new Blob([s2ab(wbout)], { type: "application/octet-stream" }));
+
+                function s2ab(s) { const buf = new ArrayBuffer(s.length);
+                    const v = new Uint8Array(buf); for (let i = 0; i < s.length; i++) v[i] = s.charCodeAt(i) &
+                        0xFF; return buf; }
+                download(`profit-loss-${start}-to-${end}.xlsx`, new Blob([s2ab(wbout)], {
+                    type: "application/octet-stream"
+                }));
                 showToast('P&L Report exported!');
             });
         }
 
-        // ---------- DATA ----------
+        // ============================================================
+        // DATA
+        // ============================================================
         function renderDataSection() { updateLastSaveTime(); }
+
         function setupDataManagement() {
             document.getElementById('btnBackup').addEventListener('click', () => {
                 const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
@@ -1652,7 +1827,8 @@
                     const orig = btn.textContent;
                     btn.textContent = "✓ Saved!";
                     btn.style.background = '#16a34a';
-                    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
+                    setTimeout(() => { btn.textContent = orig;
+                        btn.style.background = ''; }, 1500);
                     showToast('Data saved locally!');
                 }
             });
@@ -1664,7 +1840,9 @@
                     try {
                         const nd = JSON.parse(ev.target.result);
                         if (confirm('Restore this data? Current data will be replaced.')) {
-                            db = nd; saveData(); location.reload();
+                            db = nd;
+                            saveData();
+                            location.reload();
                         }
                     } catch (err) { showToast('Error restoring: ' + err.message, 'error'); }
                 };
@@ -1674,29 +1852,56 @@
             document.getElementById('btnExportAllData').addEventListener('click', () => {
                 try {
                     const wb = XLSX.utils.book_new();
-                    const prodData = db.products.map(p => ({ 'Name': p.name, 'Category': p.category, 'Purchase Price': p.purchasePrice, 'Sale Price': p.salePrice, 'Opening Stock': p.openingStock, 'Current Stock': p.currentStock || p.openingStock, 'Sold Count': p.soldCount || 0, 'Total Profit': p.totalProfit || 0, 'Min Stock Level': p.minStockLevel || 10 }));
+                    const prodData = db.products.map(p => ({ 'Name': p.name, 'Category': p.category,
+                        'Purchase Price': p.purchasePrice, 'Sale Price': p.salePrice, 'Opening Stock': p
+                            .openingStock, 'Current Stock': p.currentStock || p.openingStock,
+                        'Sold Count': p.soldCount || 0, 'Total Profit': p.totalProfit || 0,
+                        'Min Stock Level': p.minStockLevel || 10
+                    }));
                     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(prodData), 'Products');
-                    const purData = db.purchases.map(p => ({ 'Date': p.date, 'Product': p.productName, 'Quantity': p.quantity, 'Unit Cost': p.unitCost, 'Total Cost': p.quantity * p.unitCost }));
-                    if (purData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(purData), 'Purchases');
+                    const purData = db.purchases.map(p => ({ 'Date': p.date, 'Product': p.productName,
+                        'Quantity': p.quantity, 'Unit Cost': p.unitCost, 'Total Cost': p.quantity * p
+                            .unitCost }));
+                    if (purData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(purData),
+                        'Purchases');
                     const dailyData = [];
                     for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                        dailyData.push({ 'Date': date, 'Items Count': sheet.items.length, 'Total Sales': sheet.totalSales || 0, 'Total Profit': sheet.totalProfit || 0, 'Source': sheet.source || 'manual', 'Recorded At': sheet.recordedAt ? new Date(sheet.recordedAt).toLocaleString() : '' });
+                        dailyData.push({ 'Date': date, 'Items Count': sheet.items.length, 'Total Sales': sheet
+                                .totalSales || 0, 'Total Profit': sheet.totalProfit || 0, 'Source': sheet
+                                .source || 'manual', 'Recorded At': sheet.recordedAt ? new Date(sheet
+                                    .recordedAt).toLocaleString() : '' });
                     }
-                    if (dailyData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dailyData), 'Daily Sales');
-                    if (db.expenses.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db.expenses), 'Expenses');
+                    if (dailyData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dailyData),
+                        'Daily Sales');
+                    if (db.expenses.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db
+                        .expenses), 'Expenses');
                     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-                    function s2ab(s) { const buf = new ArrayBuffer(s.length); const v = new Uint8Array(buf); for (let i=0; i<s.length; i++) v[i] = s.charCodeAt(i) & 0xFF; return buf; }
-                    download(`orji-data-${todayStr()}.xlsx`, new Blob([s2ab(wbout)], { type: "application/octet-stream" }));
+
+                    function s2ab(s) { const buf = new ArrayBuffer(s.length);
+                        const v = new Uint8Array(buf); for (let i = 0; i < s.length; i++) v[i] = s.charCodeAt(
+                            i) & 0xFF; return buf; }
+                    download(`orji-data-${todayStr()}.xlsx`, new Blob([s2ab(wbout)], {
+                        type: "application/octet-stream"
+                    }));
                     showToast('All data exported to Excel!');
                 } catch (err) { showToast('Export error: ' + err.message, 'error'); }
             });
             document.getElementById('btnExportProfitLoss').addEventListener('click', () => {
-                const from = document.getElementById('exportFrom').value || '2026-07-18', to = document.getElementById('exportTo').value || '2026-07-18';
-                let totalSales = 0, totalProfit = 0, totalExpenses = 0;
+                const from = document.getElementById('exportFrom').value || '2020-01-01';
+                const to = document.getElementById('exportTo').value || '2030-12-31';
+                if (!from || !to) { showToast('Select date range', 'error'); return; }
+                let totalSales = 0,
+                    totalProfit = 0,
+                    totalExpenses = 0;
                 for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                    if (date >= from && date <= to) { totalSales += sheet.totalSales || 0; totalProfit += sheet.totalProfit || 0; }
+                    if (date >= from && date <= to) {
+                        totalSales += sheet.totalSales || 0;
+                        totalProfit += sheet.totalProfit || 0;
+                    }
                 }
-                db.expenses.forEach(e => { if (e.date >= from && e.date <= to) totalExpenses += e.amount || 0; });
+                db.expenses.forEach(e => {
+                    if (e.date >= from && e.date <= to) totalExpenses += e.amount || 0;
+                });
                 const netProfit = totalProfit - totalExpenses;
                 const margin = totalSales > 0 ? (totalProfit / totalSales * 100).toFixed(1) : 0;
                 const data = [
@@ -1705,13 +1910,19 @@
                     ["Generated:", new Date().toLocaleString()],
                     [],
                     ["Total Sales", "Total Expenses", "Gross Profit", "Net Profit", "Profit Margin"],
-                    [UGX(totalSales).replace('UGX','').trim(), UGX(totalExpenses).replace('UGX','').trim(), UGX(totalProfit).replace('UGX','').trim(), UGX(netProfit).replace('UGX','').trim(), `${margin}%`]
+                    [UGX(totalSales).replace('UGX', '').trim(), UGX(totalExpenses).replace('UGX', '').trim(),
+                        UGX(totalProfit).replace('UGX', '').trim(), UGX(netProfit).replace('UGX', '').trim(),
+                        `${margin}%`
+                    ]
                 ];
                 const ws = XLSX.utils.aoa_to_sheet(data);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "P&L");
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-                function s2ab(s) { const buf = new ArrayBuffer(s.length); const v = new Uint8Array(buf); for (let i=0; i<s.length; i++) v[i] = s.charCodeAt(i) & 0xFF; return buf; }
+
+                function s2ab(s) { const buf = new ArrayBuffer(s.length);
+                    const v = new Uint8Array(buf); for (let i = 0; i < s.length; i++) v[i] = s.charCodeAt(i) &
+                        0xFF; return buf; }
                 download(`pnl-${from}-to-${to}.xlsx`, new Blob([s2ab(wbout)], { type: "application/octet-stream" }));
                 showToast('P&L Excel exported!');
             });
@@ -1727,16 +1938,23 @@
                     db.dailySheets = {};
                     recalculateAllStock();
                     saveData();
-                    renderSales(); renderProducts(); updateDashboardStats();
+                    renderSales();
+                    renderProducts();
+                    updateDashboardStats();
                     showToast('Sales records cleared!', 'warning');
                 }
             });
             document.getElementById('btnClearPurchases').addEventListener('click', () => {
-                if (confirm('Clear all purchase records? Stock will be recalculated based on opening and sales. Cannot be undone!')) {
+                if (confirm(
+                        'Clear all purchase records? Stock will be recalculated based on opening and sales. Cannot be undone!'
+                        )) {
                     db.purchases = [];
                     recalculateAllStock();
                     saveData();
-                    renderPurchases(); renderProducts(); renderInventory(); updateDashboardStats();
+                    renderPurchases();
+                    renderProducts();
+                    renderInventory();
+                    updateDashboardStats();
                     showToast('Purchases cleared, stock recalculated.', 'warning');
                 }
             });
@@ -1744,21 +1962,29 @@
                 if (confirm('Clear all expenses? Cannot be undone!')) {
                     db.expenses = [];
                     saveData();
-                    renderExpenses(); updateDashboardStats();
+                    renderExpenses();
+                    updateDashboardStats();
                     showToast('Expenses cleared.', 'warning');
                 }
             });
         }
 
-        // ---------- GOOGLE DRIVE ----------
+        // ============================================================
+        // GOOGLE DRIVE
+        // ============================================================
         const GOOGLE_CLIENT_ID = "1012401719257-nm0hj0h1na9d7tm8eat4tllgigjrbir0.apps.googleusercontent.com";
         const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
         const DRIVE_FILE_NAME = "orji-supplies-backup.json";
-        let driveAccessToken = null, driveTokenClient = null;
+        let driveAccessToken = null,
+            driveTokenClient = null;
+
         function setCloudStatus(text, good = false) {
             const el = document.getElementById('cloudStatus');
-            if (el) { el.textContent = text; el.style.background = good ? '#16a34a' : '#64748b'; el.style.color = 'white'; }
+            if (el) { el.textContent = text;
+                el.style.background = good ? '#16a34a' : '#64748b';
+                el.style.color = 'white'; }
         }
+
         async function initGoogleDrive() {
             return new Promise((resolve) => {
                 if (typeof google === 'undefined' || !google.accounts) {
@@ -1780,13 +2006,17 @@
                         }
                     });
                     resolve();
-                } catch (err) { console.error('Google Drive init error:', err); setCloudStatus("✗ Not available", false); resolve(); }
+                } catch (err) { console.error('Google Drive init error:', err);
+                    setCloudStatus("✗ Not available", false);
+                    resolve(); }
             });
         }
+
         async function driveEnsureToken(interactive = true) {
             return new Promise((resolve) => {
                 if (driveAccessToken) { resolve(true); return; }
-                if (!driveTokenClient) { setCloudStatus("Google Drive not initialized"); resolve(false); return; }
+                if (!driveTokenClient) { setCloudStatus("Google Drive not initialized");
+                    resolve(false); return; }
                 driveTokenClient.callback = (resp) => {
                     if (resp && resp.access_token) {
                         driveAccessToken = resp.access_token;
@@ -1800,46 +2030,73 @@
                 driveTokenClient.requestAccessToken(interactive ? { prompt: 'consent' } : { prompt: '' });
             });
         }
+
         async function driveFindBackup() {
             try {
-                const q = encodeURIComponent(`name='${DRIVE_FILE_NAME}' and mimeType='application/json' and trashed=false`);
-                const resp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime,size)`, { headers: { Authorization: `Bearer ${driveAccessToken}` } });
+                const q = encodeURIComponent(
+                    `name='${DRIVE_FILE_NAME}' and mimeType='application/json' and trashed=false`);
+                const resp = await fetch(
+                    `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime,size)`, {
+                        headers: { Authorization: `Bearer ${driveAccessToken}` }
+                    });
                 if (!resp.ok) throw new Error(`Drive API error: ${resp.status}`);
                 const data = await resp.json();
                 return data.files && data.files[0] ? data.files[0] : null;
             } catch (err) { console.error('Error finding backup:', err); return null; }
         }
+
         async function driveDownloadFile(fileId) {
-            const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, { headers: { Authorization: `Bearer ${driveAccessToken}` } });
+            const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+                headers: { Authorization: `Bearer ${driveAccessToken}` }
+            });
             if (!resp.ok) throw new Error(`Download failed: ${resp.status}`);
             return resp.text();
         }
+
         function makeMultipartBody(meta, contentStr) {
             const boundary = "-------orji-backup" + Math.random().toString(36).slice(2);
-            const delimiter = `\r\n--${boundary}\r\n`, close = `\r\n--${boundary}--`;
-            const body = delimiter + "Content-Type: application/json; charset=UTF-8\r\n\r\n" + JSON.stringify(meta) + delimiter + "Content-Type: application/json\r\n\r\n" + contentStr + close;
-            return { body, headers: { "Content-Type": `multipart/related; boundary=${boundary}`, "Authorization": `Bearer ${driveAccessToken}` } };
+            const delimiter = `\r\n--${boundary}\r\n`,
+                close = `\r\n--${boundary}--`;
+            const body = delimiter + "Content-Type: application/json; charset=UTF-8\r\n\r\n" + JSON.stringify(meta) +
+                delimiter + "Content-Type: application/json\r\n\r\n" + contentStr + close;
+            return { body, headers: { "Content-Type": `multipart/related; boundary=${boundary}`,
+                    "Authorization": `Bearer ${driveAccessToken}` } };
         }
+
         async function driveCreateBackup(jsonStr) {
-            const meta = { name: DRIVE_FILE_NAME, mimeType: "application/json", description: "Orji Supplies Management Backup" };
+            const meta = { name: DRIVE_FILE_NAME, mimeType: "application/json",
+            description: "Orji Supplies Management Backup" };
             const { body, headers } = makeMultipartBody(meta, jsonStr);
-            const resp = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", { method: "POST", headers, body });
+            const resp = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+                method: "POST",
+                headers,
+                body
+            });
             if (!resp.ok) throw new Error(`Create failed: ${resp.status}`);
             return resp.json();
         }
+
         async function driveUpdateBackup(fileId, jsonStr) {
             const meta = { mimeType: "application/json" };
             const { body, headers } = makeMultipartBody(meta, jsonStr);
-            const resp = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`, { method: "PATCH", headers, body });
+            const resp = await fetch(
+                `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`, {
+                    method: "PATCH",
+                    headers,
+                    body
+                });
             if (!resp.ok) throw new Error(`Update failed: ${resp.status}`);
             return resp.json();
         }
+
         async function driveSave() {
             const ok = await driveEnsureToken(true);
             if (!ok) { showToast("Please sign in to Google first.", 'error'); return; }
-            const btn = document.getElementById('btnCloudSave'), orig = btn.textContent;
+            const btn = document.getElementById('btnCloudSave'),
+                orig = btn.textContent;
             try {
-                btn.textContent = "Saving..."; btn.disabled = true;
+                btn.textContent = "Saving...";
+                btn.disabled = true;
                 const jsonData = JSON.stringify(db, null, 2);
                 const existing = await driveFindBackup();
                 if (existing) await driveUpdateBackup(existing.id, jsonData);
@@ -1848,10 +2105,15 @@
                 document.getElementById('lastCloudBackup').textContent = new Date(now).toLocaleString();
                 setCloudStatus(`✓ Saved: ${new Date().toLocaleTimeString()}`, true);
                 btn.textContent = "✓ Saved!";
-                setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
+                setTimeout(() => { btn.textContent = orig;
+                    btn.disabled = false; }, 2000);
                 showToast("✅ Backup saved to Google Drive!", 'success');
-            } catch (err) { console.error('Google Drive save error:', err); btn.textContent = orig; btn.disabled = false; showToast("Error saving to Drive: " + err.message, 'error'); }
+            } catch (err) { console.error('Google Drive save error:', err);
+                btn.textContent = orig;
+                btn.disabled = false;
+                showToast("Error saving to Drive: " + err.message, 'error'); }
         }
+
         async function driveLoad() {
             const ok = await driveEnsureToken(true);
             if (!ok) { showToast("Please sign in to Google first.", 'error'); return; }
@@ -1864,13 +2126,18 @@
                 if (confirm("This will replace ALL current data. Continue?")) {
                     db = backupData;
                     saveData();
-                    const btn = document.getElementById('btnCloudLoad'), orig = btn.textContent;
+                    const btn = document.getElementById('btnCloudLoad'),
+                        orig = btn.textContent;
                     btn.textContent = "✓ Loaded!";
                     btn.disabled = true;
-                    setTimeout(() => { btn.textContent = orig; btn.disabled = false; location.reload(); }, 1000);
+                    setTimeout(() => { btn.textContent = orig;
+                        btn.disabled = false;
+                        location.reload(); }, 1000);
                 }
-            } catch (err) { console.error('Google Drive load error:', err); showToast("Error loading from Drive: " + err.message, 'error'); }
+            } catch (err) { console.error('Google Drive load error:', err);
+                showToast("Error loading from Drive: " + err.message, 'error'); }
         }
+
         function setupGoogleDrive() {
             document.getElementById('btnGSignIn').addEventListener('click', async () => {
                 const ok = await driveEnsureToken(true);
@@ -1880,11 +2147,32 @@
             document.getElementById('btnCloudLoad').addEventListener('click', driveLoad);
         }
 
-        // ---------- INIT ----------
+        // ============================================================
+        // INIT
+        // ============================================================
         async function initializeApp() {
             initBackground();
+
+            // Set default dates: wide range for filters, business start for forms
+            document.querySelectorAll('#saleFrom, #saleTo, #productHistoryFrom, #productHistoryTo, #expenseFrom, #expenseTo, #reportStart, #reportEnd, #exportFrom, #exportTo, #purchaseFrom, #purchaseTo')
+                .forEach(input => {
+                    if (input.id.includes('From') || input.id === 'reportStart' || input.id === 'exportFrom' ||
+                        input.id === 'purchaseFrom') {
+                        if (!input.value) input.value = '2020-01-01';
+                    } else if (input.id.includes('To') || input.id === 'reportEnd' || input.id === 'exportTo' ||
+                        input.id === 'purchaseTo') {
+                        if (!input.value) input.value = '2030-12-31';
+                    }
+                });
+
+            // Business start date for forms
             const defaultDate = '2026-07-18';
-            document.querySelectorAll('input[type="date"]').forEach(input => { if (!input.value) input.value = defaultDate; });
+            document.querySelectorAll(
+                    '#saleDate, #inventoryDate, #purchaseDate, #expenseDate, #periodStart, #periodEnd, #printInventoryDate, #printExpenseFormDate'
+                    )
+                .forEach(input => {
+                    if (!input.value) input.value = defaultDate;
+                });
 
             setupTabs();
             setupProducts();
@@ -1898,7 +2186,6 @@
             setupPrintFunctionality();
 
             recalculateAllStock();
-
             await initGoogleDrive();
 
             renderProducts();
@@ -1908,8 +2195,11 @@
             document.getElementById('periodStart').addEventListener('change', updateDashboardStats);
             document.getElementById('periodEnd').addEventListener('change', updateDashboardStats);
 
-            console.log('Orji Supplies – Unified CRUD system ready.');
-            showToast('All systems now work exactly like Products – just Save, Edit, Delete.', 'success');
+            console.log('Orji Supplies – Fully Synced CRUD System ready.');
+            console.log(
+                `Products: ${db.products.length}, Sales: ${Object.keys(db.dailySheets).length}, Purchases: ${db.purchases.length}, Expenses: ${db.expenses.length}`
+                );
+            showToast('System ready – all data is fully synced!', 'success');
         }
 
         document.addEventListener('DOMContentLoaded', initializeApp);
