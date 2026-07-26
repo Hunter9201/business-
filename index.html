@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Orji Supplies - Real‑Time Management</title>
-    <meta name="description" content="Instant update for sales, expenses, debts, purchases – like products">
+    <title>Orji Supplies - Enhanced Management System</title>
+    <meta name="description" content="Fully functional stock management system with full edit capabilities">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -328,7 +328,7 @@
             </div>
         </section>
 
-        <!-- Sales (instant like products) -->
+        <!-- Sales -->
         <section id="sales" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
@@ -368,7 +368,7 @@
             </div>
         </section>
 
-        <!-- Purchases (instant like products) -->
+        <!-- Purchases -->
         <section id="purchases" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
@@ -399,7 +399,7 @@
             </div>
         </section>
 
-        <!-- Expenses (instant like products) -->
+        <!-- Expenses -->
         <section id="expenses" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
@@ -428,7 +428,7 @@
             </div>
         </section>
 
-        <!-- Debts (instant like products) -->
+        <!-- Debts -->
         <section id="debts" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
@@ -833,14 +833,20 @@
             cats.forEach(c => { const opt = document.createElement('option'); opt.value = c; datalist.appendChild(opt); });
         }
         function populateProductSelects() {
-            const saleSel = document.getElementById('saleProduct'), purSel = document.getElementById('purchaseProduct');
-            const list = db.products.map(p => `<option value="${p.id}">${p.name} (Stock: ${p.currentStock||0})</option>`).join('');
+            const saleSel = document.getElementById('saleProduct');
+            const purSel = document.getElementById('purchaseProduct');
+            
+            // Build product options for both selects - using the same list for both
+            const productOptions = db.products.map(p => 
+                `<option value="${p.id}" data-price="${p.salePrice}">${p.name} (Stock: ${p.currentStock||0})</option>`
+            ).join('');
+            
             if (saleSel) {
-                saleSel.innerHTML = '<option value="">Select Product</option>' + db.products.map(p => 
-                    `<option value="${p.id}" data-price="${p.salePrice}">${p.name} (Stock: ${p.currentStock||0})</option>`
-                ).join('');
+                saleSel.innerHTML = '<option value="">Select Product</option>' + productOptions;
             }
-            if (purSel) purSel.innerHTML = '<option value="">Select Product</option>' + list;
+            if (purSel) {
+                purSel.innerHTML = '<option value="">Select Product</option>' + productOptions;
+            }
         }
 
         function setupProducts() {
@@ -855,7 +861,6 @@
                 document.getElementById('productOpeningStock').value = p.openingStock || 0;
                 document.getElementById('productMinStock').value = p.minStockLevel || 20;
                 document.getElementById('btnDeleteProduct').disabled = false;
-                // Scroll to form
                 document.getElementById('productName').scrollIntoView({ behavior: 'smooth' });
             });
             document.getElementById('btnSaveProduct').addEventListener('click', () => {
@@ -871,7 +876,6 @@
                         const oldOpening = p.openingStock || 0;
                         p.name = name; p.category = cat; p.purchasePrice = cost; p.salePrice = price; 
                         p.openingStock = opening; p.minStockLevel = min;
-                        // Adjust current stock if opening changed
                         if (p.currentStock !== undefined) {
                             p.currentStock = p.currentStock - oldOpening + opening;
                         } else {
@@ -891,7 +895,6 @@
             });
             document.getElementById('btnDeleteProduct').addEventListener('click', () => {
                 if (!editingProductId || !confirm('Delete this product? This will remove all associated data.')) return;
-                // Remove product from all sales
                 const product = db.products.find(p => p.id === editingProductId);
                 if (product) {
                     Object.keys(db.dailySheets).forEach(date => {
@@ -911,7 +914,7 @@
             document.getElementById('productSort').addEventListener('change', renderProducts);
         }
 
-        // ================ SALES (instant like products) ================
+        // ================ SALES ================
         let dailySaleItems = [];
         let editingSaleDate = null;
 
@@ -924,6 +927,7 @@
             document.getElementById('salePrice').value = ''; 
             updateDailySaleTotal(); 
             loadRecentSales(); 
+            populateProductSelects(); // Ensure products are loaded
         }
 
         function updateDailySaleTotal() {
@@ -975,7 +979,13 @@
         }
 
         function setupSales() {
-            document.getElementById('saleProduct').addEventListener('change', function() { const opt = this.options[this.selectedIndex]; if (opt && opt.value) document.getElementById('salePrice').value = opt.getAttribute('data-price') || ''; });
+            document.getElementById('saleProduct').addEventListener('change', function() { 
+                const opt = this.options[this.selectedIndex]; 
+                if (opt && opt.value) {
+                    const price = opt.getAttribute('data-price') || '';
+                    document.getElementById('salePrice').value = price;
+                }
+            });
             document.getElementById('btnAddSaleItem').addEventListener('click', () => {
                 const pid = document.getElementById('saleProduct').value, qty = parseInt(document.getElementById('saleQty').value) || 1, price = parseInt(document.getElementById('salePrice').value) || 0;
                 if (!pid) { alert('Select a product'); return; } if (qty <= 0) { alert('Enter valid quantity'); return; } if (price <= 0) { alert('Enter valid price'); return; }
@@ -1043,7 +1053,7 @@
             document.getElementById('btnFilterSales').addEventListener('click', loadRecentSales);
         }
 
-        // ================ PURCHASES (instant like products) ================
+        // ================ PURCHASES ================
         function renderPurchases() { document.getElementById('purchaseQty').value = '1'; document.getElementById('purchaseUnitCost').value = '0'; loadPurchases(); populateProductSelects(); }
         
         function loadPurchases() {
@@ -1069,7 +1079,6 @@
             const purchase = db.purchases.find(p => p.id === id);
             if (!purchase) { alert('Purchase not found'); return; }
             
-            // Show edit modal
             const html = `
                 <div class="grid-2">
                     <div><label>Date</label><input type="date" id="editPurchaseDate" value="${purchase.date}"></div>
@@ -1086,18 +1095,15 @@
                 if (newQty <= 0) { alert('Enter valid quantity'); return; }
                 if (newCost <= 0) { alert('Enter valid cost'); return; }
                 
-                // Revert old purchase from stock
                 const product = db.products.find(p => p.id === purchase.productId);
                 if (product) {
                     product.currentStock = Math.max(0, (product.currentStock || 0) - purchase.quantity);
                 }
                 
-                // Update purchase
                 purchase.date = newDate;
                 purchase.quantity = newQty;
                 purchase.unitCost = newCost;
                 
-                // Apply new purchase to stock
                 if (product) {
                     product.currentStock = (product.currentStock || 0) + newQty;
                 }
@@ -1211,7 +1217,7 @@
             });
         }
 
-        // ================ EXPENSES (instant like products) ================
+        // ================ EXPENSES ================
         function renderExpenses() { document.getElementById('expenseDescription').value = ''; document.getElementById('expenseAmount').value = '0'; loadExpenses(); }
         function loadExpenses() {
             const from = document.getElementById('expenseFrom').value || todayStr(), to = document.getElementById('expenseTo').value || todayStr();
@@ -1276,7 +1282,7 @@
             document.getElementById('btnFilterExpenses').addEventListener('click', loadExpenses);
         }
 
-        // ================ DEBTS (instant like products) ================
+        // ================ DEBTS ================
         function renderDebts() {
             const filter = document.getElementById('debtFilter').value;
             const from = document.getElementById('debtFrom').value || todayStr();
