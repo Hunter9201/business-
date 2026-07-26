@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Orji Supplies - Management System</title>
-    <meta name="description" content="Unified CRUD system – Products, Sales, Purchases, Expenses all work the same way.">
+    <meta name="description" content="Fully synced CRUD – Sales now work like Products: every sale is a separate record.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer>
     </script>
@@ -384,20 +384,20 @@
                     <div class="right no-print" style="margin-top:16px;">
                         <div class="stat"><span class="muted">Total Sales</span><b id="saleTotal">UGX 0</b></div>
                         <div class="stat"><span class="muted">Total Profit</span><b id="saleProfit">UGX 0</b></div>
-                        <button class="btn ok" id="btnSaveDailySales">Save Sales</button>
+                        <button class="btn ok" id="btnSaveDailySales">Save Sale</button>
                     </div>
-                    <div class="print-only" style="margin-top:20px;text-align:center;"><div class="hr"></div><p><strong>Note:</strong> This is a sales entry form. Saved records appear in the Recent Sales section.</p></div>
+                    <div class="print-only" style="margin-top:20px;text-align:center;"><div class="hr"></div><p><strong>Note:</strong> Each sale is saved as a separate record – no sale is ever overwritten.</p></div>
                 </div>
 
                 <div class="card">
                     <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Sales Report</h3><p>Period: <span id="printSalesPeriod"></span> | Generated: <span id="printSalesGenerated"></span></p><div class="hr"></div></div>
-                    <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Sales</h3><button class="btn" id="btnPrintSalesHistory">Print</button></div>
+                    <div class="section-tools no-print"><h3 style="margin-right:auto">All Sales Records</h3><button class="btn" id="btnPrintSalesHistory">Print</button></div>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
                         <div><label>From Date</label><input type="date" id="saleFrom" value="2020-01-01"></div>
                         <div><label>To Date</label><input type="date" id="saleTo" value="2030-12-31"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterSales">Filter</button></div>
                     </div>
-                    <div><table class="table compact-table" id="salesHistoryTable"><thead><tr><th>Date</th><th>Items Sold</th><th>Total Sales</th><th>Total Profit</th><th>Source</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
+                    <div><table class="table compact-table" id="salesHistoryTable"><thead><tr><th>Date</th><th>Items</th><th>Total Sales</th><th>Total Profit</th><th>Ref</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
                     <div class="print-only" style="margin-top:20px;text-align:center;font-style:italic;"><div class="hr"></div><p>End of Sales Report</p></div>
                 </div>
             </div>
@@ -594,6 +594,7 @@
     <script>
         // ============================================================
         // ORJI SUPPLIES – FULLY SYNCED CRUD SYSTEM
+        // SALES NOW WORK LIKE PRODUCTS – EACH SALE IS A SEPARATE RECORD
         // ============================================================
 
         // ---------- TOAST ----------
@@ -686,17 +687,80 @@
         }
 
         // ---------- DATA ----------
-        const STORAGE_KEY = 'orji_supplies_management_v5';
+        const STORAGE_KEY = 'orji_supplies_management_v6';
         let db = {
             products: [],
-            dailySheets: {},
+            // SALES are now an ARRAY – each sale is a separate record (like products!)
+            sales: [],
             purchases: [],
             expenses: [],
             settings: { lastSave: new Date().toISOString(), accountingPeriod: 'monthly', periodStart: '2026-07-18',
                 periodEnd: '2026-07-18' }
         };
-        try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) { const parsed = JSON.parse(saved);
-                db = parsed; } } catch (e) { console.error('Error loading saved data:', e); }
+
+        // Migrate old dailySheets to new sales array if needed
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // If old format with dailySheets object, migrate to sales array
+                if (parsed.dailySheets && typeof parsed.dailySheets === 'object' && !Array.isArray(parsed.dailySheets)) {
+                    const oldSheets = parsed.dailySheets;
+                    parsed.sales = [];
+                    for (const [date, sheet] of Object.entries(oldSheets)) {
+                        parsed.sales.push({
+                            id: 'sale_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                            date: date,
+                            items: sheet.items || [],
+                            totalSales: sheet.totalSales || 0,
+                            totalProfit: sheet.totalProfit || 0,
+                            source: sheet.source || 'manual',
+                            sheetReference: sheet.sheetReference || '',
+                            recordedAt: sheet.recordedAt || new Date().toISOString()
+                        });
+                    }
+                    delete parsed.dailySheets;
+                }
+                // If sales is still an object (old migration), convert to array
+                if (parsed.sales && typeof parsed.sales === 'object' && !Array.isArray(parsed.sales)) {
+                    const oldSales = parsed.sales;
+                    parsed.sales = [];
+                    for (const [key, sale] of Object.entries(oldSales)) {
+                        if (sale && typeof sale === 'object') {
+                            parsed.sales.push({
+                                id: sale.id || 'sale_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                                date: sale.date || key,
+                                items: sale.items || [],
+                                totalSales: sale.totalSales || 0,
+                                totalProfit: sale.totalProfit || 0,
+                                source: sale.source || 'manual',
+                                sheetReference: sale.sheetReference || '',
+                                recordedAt: sale.recordedAt || new Date().toISOString()
+                            });
+                        }
+                    }
+                }
+                if (!parsed.sales) parsed.sales = [];
+                if (!parsed.products) parsed.products = [];
+                if (!parsed.purchases) parsed.purchases = [];
+                if (!parsed.expenses) parsed.expenses = [];
+                if (!parsed.settings) parsed.settings = { lastSave: new Date().toISOString(), periodStart: '2026-07-18',
+                    periodEnd: '2026-07-18' };
+                db = parsed;
+            }
+        } catch (e) {
+            console.error('Error loading saved data:', e);
+            // Ensure db has all required keys
+            if (!db.sales) db.sales = [];
+            if (!db.products) db.products = [];
+            if (!db.purchases) db.purchases = [];
+            if (!db.expenses) db.expenses = [];
+            if (!db.settings) db.settings = { lastSave: new Date().toISOString(), periodStart: '2026-07-18',
+                periodEnd: '2026-07-18' };
+        }
+
+        // Ensure db always has a sales array
+        if (!db.sales) db.sales = [];
 
         function saveData() {
             try {
@@ -704,7 +768,10 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
                 updateLastSaveTime();
                 return true;
-            } catch (e) { console.error('Error saving data:', e); return false; }
+            } catch (e) {
+                console.error('Error saving data:', e);
+                return false;
+            }
         }
 
         function updateLastSaveTime() {
@@ -722,8 +789,8 @@
 
                 let totalSold = 0;
                 let totalProfit = 0;
-                Object.values(db.dailySheets).forEach(sheet => {
-                    sheet.items.forEach(item => {
+                db.sales.forEach(sale => {
+                    sale.items.forEach(item => {
                         if (item.productId === p.id) {
                             totalSold += item.quantity;
                             totalProfit += item.profit;
@@ -847,8 +914,8 @@
                 pe = document.getElementById('periodEnd').value || '2026-07-18';
             let grossProfit = 0,
                 totalExpenses = 0;
-            Object.values(db.dailySheets).forEach(sheet => {
-                if (sheet.date >= ps && sheet.date <= pe) grossProfit += sheet.totalProfit || 0;
+            db.sales.forEach(sale => {
+                if (sale.date >= ps && sale.date <= pe) grossProfit += sale.totalProfit || 0;
             });
             db.expenses.forEach(e => {
                 if (e.date >= ps && e.date <= pe) totalExpenses += e.amount || 0;
@@ -1086,18 +1153,18 @@
         }
 
         // ============================================================
-        // SALES
+        // SALES – NOW WORKS LIKE PRODUCTS (each sale is a separate record)
         // ============================================================
         let dailySaleItems = [];
-        let editingSaleDate = null;
+        let editingSaleId = null;
 
         function renderSales() {
             dailySaleItems = [];
-            editingSaleDate = null;
+            editingSaleId = null;
             document.getElementById('sheetReference').value = '';
             document.getElementById('saleQty').value = '1';
             document.getElementById('salePrice').value = '';
-            document.getElementById('btnSaveDailySales').textContent = 'Save Sales';
+            document.getElementById('btnSaveDailySales').textContent = 'Save Sale';
             updateDailySaleTotal();
             loadRecentSales();
         }
@@ -1116,16 +1183,14 @@
         function loadRecentSales() {
             const from = document.getElementById('saleFrom').value || '2020-01-01';
             const to = document.getElementById('saleTo').value || '2030-12-31';
-            const filtered = [];
-            for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                if (date >= from && date <= to) filtered.push({ date, ...sheet });
-            }
+            let filtered = db.sales.filter(s => s.date >= from && s.date <= to);
             filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
             const tbody = document.querySelector('#salesHistoryTable tbody');
             if (tbody) {
                 if (filtered.length === 0) {
                     tbody.innerHTML =
-                        `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No sales found in this date range. Try adjusting the filters.</td></tr>`;
+                        `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No sales found. Create your first sale!</td></tr>`;
                 } else {
                     tbody.innerHTML = filtered.map(s => {
                         const itemCount = s.items?.length || 0;
@@ -1134,10 +1199,10 @@
                         <td>${itemCount} items</td>
                         <td>${UGX(s.totalSales||0)}</td>
                         <td><span class="profit-positive">${UGX(s.totalProfit||0)}</span></td>
-                        <td><span class="pill">${s.source||'manual'}</span></td>
+                        <td><span class="pill">${s.sheetReference || s.source || 'manual'}</span></td>
                         <td class="no-print">
-                            <button class="btn" data-edit-sale="${s.date}">Edit</button>
-                            <button class="btn bad" data-delete-sale="${s.date}">Delete</button>
+                            <button class="btn" data-edit-sale="${s.id}">Edit</button>
+                            <button class="btn bad" data-delete-sale="${s.id}">Delete</button>
                         </td>
                     </tr>`;
                     }).join('');
@@ -1145,17 +1210,17 @@
             }
         }
 
-        function loadSaleForEditing(date) {
-            const sheet = db.dailySheets[date];
-            if (!sheet) { showToast('Sale record not found', 'error'); return; }
-            dailySaleItems = sheet.items.map(item => ({ ...item }));
-            editingSaleDate = date;
-            document.getElementById('saleDate').value = date;
-            document.getElementById('sheetReference').value = sheet.sheetReference || '';
-            document.getElementById('btnSaveDailySales').textContent = 'Update Sales';
+        function loadSaleForEditing(id) {
+            const sale = db.sales.find(s => s.id === id);
+            if (!sale) { showToast('Sale record not found', 'error'); return; }
+            dailySaleItems = sale.items.map(item => ({ ...item }));
+            editingSaleId = id;
+            document.getElementById('saleDate').value = sale.date;
+            document.getElementById('sheetReference').value = sale.sheetReference || '';
+            document.getElementById('btnSaveDailySales').textContent = 'Update Sale';
             updateDailySaleTotal();
             document.getElementById('sales').scrollIntoView({ behavior: 'smooth' });
-            showToast(`Loaded sale for ${date} – modify and save.`, 'warning');
+            showToast(`Loaded sale for editing – modify and save.`, 'warning');
         }
 
         function setupSales() {
@@ -1197,60 +1262,18 @@
             document.getElementById('salesHistoryTable').addEventListener('click', (e) => {
                 const editBtn = e.target.closest('[data-edit-sale]');
                 if (editBtn) {
-                    const date = editBtn.getAttribute('data-edit-sale');
-                    loadSaleForEditing(date);
+                    const id = editBtn.getAttribute('data-edit-sale');
+                    loadSaleForEditing(id);
                     return;
                 }
                 const delBtn = e.target.closest('[data-delete-sale]');
                 if (delBtn) {
-                    const date = delBtn.getAttribute('data-delete-sale');
-                    if (!confirm(`Delete sale record for ${date}?`)) return;
-                    const sheet = db.dailySheets[date];
-                    if (sheet) {
-                        sheet.items.forEach(item => {
-                            const p = db.products.find(x => x.id === item.productId);
-                            if (p) {
-                                p.currentStock = (p.currentStock || 0) + item.quantity;
-                                p.soldCount = Math.max(0, (p.soldCount || 0) - item.quantity);
-                                p.totalProfit = Math.max(0, (p.totalProfit || 0) - item.profit);
-                            }
-                        });
-                        delete db.dailySheets[date];
-                        if (editingSaleDate === date) { editingSaleDate = null;
-                            document.getElementById('btnSaveDailySales').textContent = 'Save Sales'; }
-                        saveData();
-                        renderSales();
-                        renderProducts();
-                        renderInventory();
-                        updateDashboardStats();
-                        showToast(`Sale for ${date} deleted.`, 'warning');
-                    }
-                }
-            });
-
-            document.getElementById('btnSaveDailySales').addEventListener('click', () => {
-                if (!dailySaleItems.length) { showToast('Add items first', 'error'); return; }
-                const date = document.getElementById('saleDate').value || '2026-07-18';
-                const ref = document.getElementById('sheetReference').value.trim() || 'manual';
-
-                if (editingSaleDate && editingSaleDate !== date) {
-                    const oldSheet = db.dailySheets[editingSaleDate];
-                    if (oldSheet) {
-                        oldSheet.items.forEach(item => {
-                            const p = db.products.find(x => x.id === item.productId);
-                            if (p) {
-                                p.currentStock = (p.currentStock || 0) + item.quantity;
-                                p.soldCount = Math.max(0, (p.soldCount || 0) - item.quantity);
-                                p.totalProfit = Math.max(0, (p.totalProfit || 0) - item.profit);
-                            }
-                        });
-                        delete db.dailySheets[editingSaleDate];
-                    }
-                }
-
-                if (db.dailySheets[date]) {
-                    const oldSheet = db.dailySheets[date];
-                    oldSheet.items.forEach(item => {
+                    const id = delBtn.getAttribute('data-delete-sale');
+                    const sale = db.sales.find(s => s.id === id);
+                    if (!sale) return;
+                    if (!confirm(`Delete sale record for ${sale.date}?`)) return;
+                    // Reverse stock effects
+                    sale.items.forEach(item => {
                         const p = db.products.find(x => x.id === item.productId);
                         if (p) {
                             p.currentStock = (p.currentStock || 0) + item.quantity;
@@ -1258,8 +1281,41 @@
                             p.totalProfit = Math.max(0, (p.totalProfit || 0) - item.profit);
                         }
                     });
+                    db.sales = db.sales.filter(s => s.id !== id);
+                    if (editingSaleId === id) { editingSaleId = null;
+                        document.getElementById('btnSaveDailySales').textContent = 'Save Sale'; }
+                    saveData();
+                    renderSales();
+                    renderProducts();
+                    renderInventory();
+                    updateDashboardStats();
+                    showToast(`Sale deleted.`, 'warning');
+                }
+            });
+
+            document.getElementById('btnSaveDailySales').addEventListener('click', () => {
+                if (!dailySaleItems.length) { showToast('Add items first', 'error'); return; }
+
+                const date = document.getElementById('saleDate').value || '2026-07-18';
+                const ref = document.getElementById('sheetReference').value.trim() || 'manual';
+
+                // If editing, remove old sale's stock effects first
+                if (editingSaleId) {
+                    const oldSale = db.sales.find(s => s.id === editingSaleId);
+                    if (oldSale) {
+                        oldSale.items.forEach(item => {
+                            const p = db.products.find(x => x.id === item.productId);
+                            if (p) {
+                                p.currentStock = (p.currentStock || 0) + item.quantity;
+                                p.soldCount = Math.max(0, (p.soldCount || 0) - item.quantity);
+                                p.totalProfit = Math.max(0, (p.totalProfit || 0) - item.profit);
+                            }
+                        });
+                        db.sales = db.sales.filter(s => s.id !== editingSaleId);
+                    }
                 }
 
+                // Apply new items to stock
                 const total = dailySaleItems.reduce((s, i) => s + i.total, 0);
                 const profit = dailySaleItems.reduce((s, i) => s + i.profit, 0);
                 dailySaleItems.forEach(item => {
@@ -1271,8 +1327,10 @@
                     }
                 });
 
-                db.dailySheets[date] = {
-                    date,
+                // Create new sale record (always a new one, never overwrites)
+                const newSale = {
+                    id: 'sale_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                    date: date,
                     items: [...dailySaleItems],
                     totalSales: total,
                     totalProfit: profit,
@@ -1280,12 +1338,17 @@
                     sheetReference: ref,
                     recordedAt: new Date().toISOString()
                 };
+
+                db.sales.push(newSale);
+                editingSaleId = null;
+                document.getElementById('btnSaveDailySales').textContent = 'Save Sale';
+
                 saveData();
                 renderSales();
                 renderProducts();
                 renderInventory();
                 updateDashboardStats();
-                showToast(`Sales saved for ${date}! Total: ${UGX(total)}, Profit: ${UGX(profit)}`, 'success');
+                showToast(`Sale saved! Total: ${UGX(total)}, Profit: ${UGX(profit)}`, 'success');
             });
 
             document.getElementById('btnFilterSales').addEventListener('click', loadRecentSales);
@@ -1302,23 +1365,24 @@
             const p = db.products.find(x => x.id === pid);
             if (!p) return;
             const sales = [];
-            for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                if (date >= from && date <= to) {
-                    const items = sheet.items.filter(i => i.productId === pid);
+            db.sales.forEach(sale => {
+                if (sale.date >= from && sale.date <= to) {
+                    const items = sale.items.filter(i => i.productId === pid);
                     if (items.length) {
                         const qty = items.reduce((s, i) => s + i.quantity, 0);
                         const tot = items.reduce((s, i) => s + i.total, 0);
                         const prof = items.reduce((s, i) => s + i.profit, 0);
-                        sales.push({ date, qty, totalSales: tot, totalProfit: prof, avgPrice: qty > 0 ? tot / qty : 0 });
+                        sales.push({ date: sale.date, qty, totalSales: tot, totalProfit: prof, avgPrice: qty > 0 ?
+                                tot / qty : 0 });
                     }
                 }
-            }
+            });
             sales.sort((a, b) => new Date(b.date) - new Date(a.date));
             const tbody = document.querySelector('#productHistoryTable tbody');
             if (tbody) {
                 if (sales.length === 0) {
                     tbody.innerHTML =
-                        `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">No sales found for this product in the selected date range.</td></tr>`;
+                        `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">No sales found for this product.</td></tr>`;
                 } else {
                     tbody.innerHTML = sales.map(s =>
                         `<tr><td><strong>${s.date}</strong></td><td>${s.qty}</td><td>${UGX(s.totalSales)}</td><td><span class="profit-positive">${UGX(s.totalProfit)}</span></td><td>${UGX(s.avgPrice)}</td></tr>`
@@ -1351,7 +1415,7 @@
             if (tbody) {
                 if (filtered.length === 0) {
                     tbody.innerHTML =
-                        `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No purchases found in this date range.</td></tr>`;
+                        `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No purchases found.</td></tr>`;
                 } else {
                     tbody.innerHTML = filtered.map(p => {
                         return `<tr>
@@ -1396,8 +1460,7 @@
                     const id = delBtn.getAttribute('data-delete-purchase');
                     const purchase = db.purchases.find(p => p.id === id);
                     if (!purchase) return;
-                    if (!confirm(`Delete purchase of ${purchase.quantity} x ${purchase.productName} on ${purchase.date}?`))
-                        return;
+                    if (!confirm(`Delete purchase of ${purchase.quantity} x ${purchase.productName}?`)) return;
                     const product = db.products.find(p => p.id === purchase.productId);
                     if (product) {
                         product.currentStock = Math.max(0, (product.currentStock || 0) - purchase.quantity);
@@ -1499,7 +1562,7 @@
             if (tbody) {
                 if (filtered.length === 0) {
                     tbody.innerHTML =
-                        `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">No expenses found in this date range.</td></tr>`;
+                        `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">No expenses found.</td></tr>`;
                 } else {
                     tbody.innerHTML = filtered.map(e => {
                         return `<tr>
@@ -1595,9 +1658,9 @@
                 const totalPurchased = purchases.reduce((sum, pur) => sum + pur.quantity, 0);
                 let sold = 0,
                     profit = 0;
-                Object.entries(db.dailySheets).forEach(([d, sheet]) => {
-                    if (d <= date) {
-                        const items = sheet.items.filter(i => i.productId === p.id);
+                db.sales.forEach(sale => {
+                    if (sale.date <= date) {
+                        const items = sale.items.filter(i => i.productId === p.id);
                         sold += items.reduce((s, i) => s + i.quantity, 0);
                         profit += items.reduce((s, i) => s + i.profit, 0);
                     }
@@ -1654,9 +1717,9 @@
                     const totalPurchased = purchases.reduce((sum, pur) => sum + pur.quantity, 0);
                     let sold = 0,
                         profit = 0;
-                    Object.entries(db.dailySheets).forEach(([d, sheet]) => {
-                        if (d <= date) {
-                            const items = sheet.items.filter(i => i.productId === p.id);
+                    db.sales.forEach(sale => {
+                        if (sale.date <= date) {
+                            const items = sale.items.filter(i => i.productId === p.id);
                             sold += items.reduce((s, i) => s + i.quantity, 0);
                             profit += items.reduce((s, i) => s + i.profit, 0);
                         }
@@ -1695,11 +1758,11 @@
                 totalProfit = 0,
                 totalExpenses = 0;
             const catBreak = {};
-            for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                if (date >= start && date <= end) {
-                    totalSales += sheet.totalSales || 0;
-                    totalProfit += sheet.totalProfit || 0;
-                    sheet.items.forEach(item => {
+            db.sales.forEach(sale => {
+                if (sale.date >= start && sale.date <= end) {
+                    totalSales += sale.totalSales || 0;
+                    totalProfit += sale.totalProfit || 0;
+                    sale.items.forEach(item => {
                         const p = db.products.find(x => x.id === item.productId);
                         const cat = p ? p.category || 'Other' : 'Other';
                         if (!catBreak[cat]) catBreak[cat] = { sales: 0, profit: 0, items: 0 };
@@ -1708,7 +1771,7 @@
                         catBreak[cat].items += item.quantity;
                     });
                 }
-            }
+            });
             db.expenses.forEach(e => {
                 if (e.date >= start && e.date <= end) totalExpenses += e.amount || 0;
             });
@@ -1758,12 +1821,12 @@
                 let totalSales = 0,
                     totalProfit = 0,
                     totalExpenses = 0;
-                for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                    if (date >= start && date <= end) {
-                        totalSales += sheet.totalSales || 0;
-                        totalProfit += sheet.totalProfit || 0;
+                db.sales.forEach(sale => {
+                    if (sale.date >= start && sale.date <= end) {
+                        totalSales += sale.totalSales || 0;
+                        totalProfit += sale.totalProfit || 0;
                     }
-                }
+                });
                 db.expenses.forEach(e => {
                     if (e.date >= start && e.date <= end) totalExpenses += e.amount || 0;
                 });
@@ -1784,17 +1847,17 @@
                     ["DAILY BREAKDOWN"],
                     ["Date", "Sales", "Profit", "Expenses", "Net"]
                 ];
-                for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                    if (date >= start && date <= end) {
-                        const de = db.expenses.filter(e => e.date === date).reduce((s, e) => s + (e.amount || 0),
-                        0);
-                        const dn = (sheet.totalProfit || 0) - de;
-                        data.push([date, UGX(sheet.totalSales || 0).replace('UGX', '').trim(), UGX(sheet
+                db.sales.forEach(sale => {
+                    if (sale.date >= start && sale.date <= end) {
+                        const de = db.expenses.filter(e => e.date === sale.date).reduce((s, e) => s + (e
+                            .amount || 0), 0);
+                        const dn = (sale.totalProfit || 0) - de;
+                        data.push([sale.date, UGX(sale.totalSales || 0).replace('UGX', '').trim(), UGX(sale
                             .totalProfit || 0).replace('UGX', '').trim(), UGX(de).replace('UGX', '').trim(),
                             UGX(dn).replace('UGX', '').trim()
                         ]);
                     }
-                }
+                });
                 const ws = XLSX.utils.aoa_to_sheet(data);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "P&L Report");
@@ -1864,15 +1927,12 @@
                             .unitCost }));
                     if (purData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(purData),
                         'Purchases');
-                    const dailyData = [];
-                    for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                        dailyData.push({ 'Date': date, 'Items Count': sheet.items.length, 'Total Sales': sheet
-                                .totalSales || 0, 'Total Profit': sheet.totalProfit || 0, 'Source': sheet
-                                .source || 'manual', 'Recorded At': sheet.recordedAt ? new Date(sheet
-                                    .recordedAt).toLocaleString() : '' });
-                    }
-                    if (dailyData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dailyData),
-                        'Daily Sales');
+                    const saleData = db.sales.map(s => ({ 'Date': s.date, 'Items': s.items.length,
+                        'Total Sales': s.totalSales || 0, 'Total Profit': s.totalProfit || 0,
+                        'Reference': s.sheetReference || '', 'Recorded At': s.recordedAt ? new Date(s
+                            .recordedAt).toLocaleString() : '' }));
+                    if (saleData.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(saleData),
+                        'Sales');
                     if (db.expenses.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(db
                         .expenses), 'Expenses');
                     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
@@ -1893,12 +1953,12 @@
                 let totalSales = 0,
                     totalProfit = 0,
                     totalExpenses = 0;
-                for (const [date, sheet] of Object.entries(db.dailySheets)) {
-                    if (date >= from && date <= to) {
-                        totalSales += sheet.totalSales || 0;
-                        totalProfit += sheet.totalProfit || 0;
+                db.sales.forEach(sale => {
+                    if (sale.date >= from && sale.date <= to) {
+                        totalSales += sale.totalSales || 0;
+                        totalProfit += sale.totalProfit || 0;
                     }
-                }
+                });
                 db.expenses.forEach(e => {
                     if (e.date >= from && e.date <= to) totalExpenses += e.amount || 0;
                 });
@@ -1935,7 +1995,7 @@
             });
             document.getElementById('btnClearSheets').addEventListener('click', () => {
                 if (confirm('Clear all sales records? Cannot be undone!')) {
-                    db.dailySheets = {};
+                    db.sales = [];
                     recalculateAllStock();
                     saveData();
                     renderSales();
@@ -2165,7 +2225,6 @@
                     }
                 });
 
-            // Business start date for forms
             const defaultDate = '2026-07-18';
             document.querySelectorAll(
                     '#saleDate, #inventoryDate, #purchaseDate, #expenseDate, #periodStart, #periodEnd, #printInventoryDate, #printExpenseFormDate'
@@ -2195,11 +2254,11 @@
             document.getElementById('periodStart').addEventListener('change', updateDashboardStats);
             document.getElementById('periodEnd').addEventListener('change', updateDashboardStats);
 
-            console.log('Orji Supplies – Fully Synced CRUD System ready.');
+            console.log('Orji Supplies – Sales now work like Products!');
             console.log(
-                `Products: ${db.products.length}, Sales: ${Object.keys(db.dailySheets).length}, Purchases: ${db.purchases.length}, Expenses: ${db.expenses.length}`
+                `Products: ${db.products.length}, Sales: ${db.sales.length}, Purchases: ${db.purchases.length}, Expenses: ${db.expenses.length}`
                 );
-            showToast('System ready – all data is fully synced!', 'success');
+            showToast('System ready – each sale is a separate record. No sale is ever overwritten!', 'success');
         }
 
         document.addEventListener('DOMContentLoaded', initializeApp);
