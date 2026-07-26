@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Orji Supplies - Management System</title>
-    <meta name="description" content="Fully synced CRUD – Sales now work like Products: every sale is a separate record.">
+    <title>Orji Supplies - Business Management</title>
+    <meta name="description" content="Complete business management: sales, purchases, expenses, cash balance, and restock alerts.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer>
     </script>
@@ -267,6 +267,19 @@
             .background-controls { bottom: 10px; right: 10px; padding: 8px 12px; }
             .toast-container { top: 70px; right: 10px; max-width: 90%; }
         }
+        .restock-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--bad);
+            color: white;
+        }
+        .restock-badge.warning {
+            background: var(--warn);
+            color: #111827;
+        }
     </style>
 </head>
 <body>
@@ -297,6 +310,7 @@
                 <button class="tab" data-tab="expenses">Expenses</button>
                 <button class="tab" data-tab="reports">Reports</button>
                 <button class="tab" data-tab="products">Products</button>
+                <button class="tab" data-tab="cash">Cash & Restock</button>
                 <button class="tab" data-tab="data">Data</button>
             </div>
         </div>
@@ -313,9 +327,10 @@
                 <div class="stat"><span class="muted">Most Moving Category</span><b id="statMostMoving">-</b></div>
             </div>
             <div class="hr"></div>
-            <div class="grid-3">
+            <div class="grid-4">
+                <div class="stat"><span class="muted">Total Cash in Hand</span><b id="statCashBalance">UGX 0</b></div>
+                <div class="stat"><span class="muted">Business Value</span><b id="statBusinessValue">UGX 0</b><span id="statTrend" style="font-size:14px;display:block;margin-top:4px;">📈 Growing</span></div>
                 <div class="stat"><span class="muted">Gross Profit (Period)</span><b id="statGrossProfit">UGX 0</b></div>
-                <div class="stat"><span class="muted">Total Expenses</span><b id="statTotalExpenses">UGX 0</b></div>
                 <div class="stat"><span class="muted">Net Profit/Loss</span><b id="statNetProfit">UGX 0</b></div>
             </div>
             <div class="hr"></div>
@@ -535,6 +550,36 @@
             </div>
         </section>
 
+        <!-- Cash & Restock -->
+        <section id="cash" class="tabpanel" style="display:none;">
+            <div class="row">
+                <div class="card" style="grid-column:span 12;">
+                    <h2>Cash Balance & Restock Alerts</h2>
+                    <div class="grid-3">
+                        <div class="stat"><span class="muted">Total Cash in Hand</span><b id="cashTotal">UGX 0</b></div>
+                        <div class="stat"><span class="muted">Total Sales</span><b id="cashTotalSales">UGX 0</b></div>
+                        <div class="stat"><span class="muted">Total Expenses</span><b id="cashTotalExpenses">UGX 0</b></div>
+                    </div>
+                    <div class="hr"></div>
+                    <h3>Daily Sales Summary</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="table" id="dailySummaryTable">
+                            <thead><tr><th>Date</th><th>Total Sales</th><th>Total Profit</th><th>Total Expenses</th><th>Net Cash</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="hr"></div>
+                    <h3>Restock Recommendations</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="table" id="restockTable">
+                            <thead><tr><th>Product</th><th>Category</th><th>Current Stock</th><th>Min Stock Level</th><th>Status</th><th>Suggested Order</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Data -->
         <section id="data" class="tabpanel" style="display:none;">
             <div class="row">
@@ -593,8 +638,7 @@
 
     <script>
         // ============================================================
-        // ORJI SUPPLIES – FULLY SYNCED CRUD SYSTEM
-        // SALES NOW WORK LIKE PRODUCTS – EACH SALE IS A SEPARATE RECORD
+        // ORJI SUPPLIES – COMPLETE BUSINESS MANAGEMENT
         // ============================================================
 
         // ---------- TOAST ----------
@@ -687,10 +731,9 @@
         }
 
         // ---------- DATA ----------
-        const STORAGE_KEY = 'orji_supplies_management_v6';
+        const STORAGE_KEY = 'orji_supplies_management_v7';
         let db = {
             products: [],
-            // SALES are now an ARRAY – each sale is a separate record (like products!)
             sales: [],
             purchases: [],
             expenses: [],
@@ -698,12 +741,11 @@
                 periodEnd: '2026-07-18' }
         };
 
-        // Migrate old dailySheets to new sales array if needed
+        // Migration for old format
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 const parsed = JSON.parse(saved);
-                // If old format with dailySheets object, migrate to sales array
                 if (parsed.dailySheets && typeof parsed.dailySheets === 'object' && !Array.isArray(parsed.dailySheets)) {
                     const oldSheets = parsed.dailySheets;
                     parsed.sales = [];
@@ -721,7 +763,6 @@
                     }
                     delete parsed.dailySheets;
                 }
-                // If sales is still an object (old migration), convert to array
                 if (parsed.sales && typeof parsed.sales === 'object' && !Array.isArray(parsed.sales)) {
                     const oldSales = parsed.sales;
                     parsed.sales = [];
@@ -750,7 +791,6 @@
             }
         } catch (e) {
             console.error('Error loading saved data:', e);
-            // Ensure db has all required keys
             if (!db.sales) db.sales = [];
             if (!db.products) db.products = [];
             if (!db.purchases) db.purchases = [];
@@ -758,8 +798,6 @@
             if (!db.settings) db.settings = { lastSave: new Date().toISOString(), periodStart: '2026-07-18',
                 periodEnd: '2026-07-18' };
         }
-
-        // Ensure db always has a sales array
         if (!db.sales) db.sales = [];
 
         function saveData() {
@@ -910,25 +948,69 @@
                     mCat = c; } }
             document.getElementById('statMostMoving').textContent = `${mCat} (${mMax} units)`;
 
+            // Cash Balance (total sales - total expenses)
+            let totalSalesAll = 0,
+                totalExpensesAll = 0;
+            db.sales.forEach(sale => { totalSalesAll += sale.totalSales || 0; });
+            db.expenses.forEach(exp => { totalExpensesAll += exp.amount || 0; });
+            const cashBalance = totalSalesAll - totalExpensesAll;
+            document.getElementById('statCashBalance').textContent = UGX(cashBalance);
+
+            // Business Value = stock value + cash balance
+            const businessValue = stockValue + cashBalance;
+            document.getElementById('statBusinessValue').textContent = UGX(businessValue);
+            // Trend: compare business value with previous period (simple: compare last 30 days vs prior 30 days)
+            const trendEl = document.getElementById('statTrend');
+            const now = new Date();
+            const thirtyDaysAgo = new Date(now);
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const sixtyDaysAgo = new Date(now);
+            sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+
+            // Compute sales and expenses for last 30 days and prior 30 days
+            let salesRecent = 0,
+                expensesRecent = 0,
+                salesPrior = 0,
+                expensesPrior = 0;
+            const dateStr30 = thirtyDaysAgo.toISOString().slice(0, 10);
+            const dateStr60 = sixtyDaysAgo.toISOString().slice(0, 10);
+            db.sales.forEach(sale => {
+                if (sale.date >= dateStr30) salesRecent += sale.totalSales || 0;
+                else if (sale.date >= dateStr60 && sale.date < dateStr30) salesPrior += sale.totalSales || 0;
+            });
+            db.expenses.forEach(exp => {
+                if (exp.date >= dateStr30) expensesRecent += exp.amount || 0;
+                else if (exp.date >= dateStr60 && exp.date < dateStr30) expensesPrior += exp.amount || 0;
+            });
+            const valueRecent = salesRecent - expensesRecent;
+            const valuePrior = salesPrior - expensesPrior;
+            let trendText = '📈 Growing';
+            if (valuePrior > 0 && valueRecent < valuePrior) trendText = '📉 Declining';
+            else if (valueRecent === 0 && valuePrior === 0) trendText = '➡️ Stable';
+            else if (valueRecent < 0) trendText = '⚠️ Loss Making';
+            trendEl.textContent = trendText;
+            trendEl.style.color = trendText.includes('Growing') ? '#16a34a' : trendText.includes('Declining') ? '#ef4444' :
+                '#f59e0b';
+
+            // Gross profit and net profit for period
             const ps = document.getElementById('periodStart').value || '2026-07-18',
                 pe = document.getElementById('periodEnd').value || '2026-07-18';
             let grossProfit = 0,
-                totalExpenses = 0;
+                totalExpensesPeriod = 0;
             db.sales.forEach(sale => {
                 if (sale.date >= ps && sale.date <= pe) grossProfit += sale.totalProfit || 0;
             });
             db.expenses.forEach(e => {
-                if (e.date >= ps && e.date <= pe) totalExpenses += e.amount || 0;
+                if (e.date >= ps && e.date <= pe) totalExpensesPeriod += e.amount || 0;
             });
-            const netProfit = grossProfit - totalExpenses;
-            const margin = grossProfit > 0 ? ((netProfit / grossProfit) * 100).toFixed(1) : 0;
+            const netProfit = grossProfit - totalExpensesPeriod;
             document.getElementById('statGrossProfit').textContent = UGX(grossProfit);
-            document.getElementById('statTotalExpenses').textContent = UGX(totalExpenses);
             document.getElementById('statNetProfit').textContent = UGX(netProfit);
+
             const statusEl = document.getElementById('profitStatus');
             if (netProfit > 0) {
                 statusEl.innerHTML =
-                    `<strong>✅ PROFITABLE:</strong> Net profit of ${UGX(netProfit)} (${margin}% margin)`;
+                    `<strong>✅ PROFITABLE:</strong> Net profit of ${UGX(netProfit)} (${grossProfit>0?((netProfit/grossProfit)*100).toFixed(1):0}% margin)`;
                 statusEl.className = 'goodmsg';
             } else if (netProfit < 0) {
                 statusEl.innerHTML = `<strong>⚠️ LOSS MAKING:</strong> Net loss of ${UGX(Math.abs(netProfit))}`;
@@ -970,6 +1052,7 @@
                         if (id === 'inventory') renderInventory();
                         if (id === 'expenses') renderExpenses();
                         if (id === 'reports') initReports();
+                        if (id === 'cash') renderCashAndRestock();
                         if (id === 'dashboard') updateDashboardStats();
                     }
                 });
@@ -977,7 +1060,7 @@
         }
 
         // ============================================================
-        // PRODUCTS
+        // PRODUCTS (unchanged)
         // ============================================================
         let editingProductId = null;
 
@@ -1153,7 +1236,7 @@
         }
 
         // ============================================================
-        // SALES – NOW WORKS LIKE PRODUCTS (each sale is a separate record)
+        // SALES (unchanged – works with array)
         // ============================================================
         let dailySaleItems = [];
         let editingSaleId = null;
@@ -1272,7 +1355,6 @@
                     const sale = db.sales.find(s => s.id === id);
                     if (!sale) return;
                     if (!confirm(`Delete sale record for ${sale.date}?`)) return;
-                    // Reverse stock effects
                     sale.items.forEach(item => {
                         const p = db.products.find(x => x.id === item.productId);
                         if (p) {
@@ -1299,7 +1381,6 @@
                 const date = document.getElementById('saleDate').value || '2026-07-18';
                 const ref = document.getElementById('sheetReference').value.trim() || 'manual';
 
-                // If editing, remove old sale's stock effects first
                 if (editingSaleId) {
                     const oldSale = db.sales.find(s => s.id === editingSaleId);
                     if (oldSale) {
@@ -1315,7 +1396,6 @@
                     }
                 }
 
-                // Apply new items to stock
                 const total = dailySaleItems.reduce((s, i) => s + i.total, 0);
                 const profit = dailySaleItems.reduce((s, i) => s + i.profit, 0);
                 dailySaleItems.forEach(item => {
@@ -1327,7 +1407,6 @@
                     }
                 });
 
-                // Create new sale record (always a new one, never overwrites)
                 const newSale = {
                     id: 'sale_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
                     date: date,
@@ -1392,7 +1471,7 @@
         }
 
         // ============================================================
-        // PURCHASES
+        // PURCHASES (unchanged)
         // ============================================================
         let editingPurchaseId = null;
 
@@ -1541,7 +1620,7 @@
         }
 
         // ============================================================
-        // EXPENSES
+        // EXPENSES (unchanged)
         // ============================================================
         let editingExpenseId = null;
 
@@ -1645,7 +1724,7 @@
         }
 
         // ============================================================
-        // INVENTORY
+        // INVENTORY (unchanged, uses db.sales)
         // ============================================================
         function renderInventory() {
             const date = document.getElementById('inventoryDate').value || '2026-07-18';
@@ -1743,7 +1822,7 @@
         }
 
         // ============================================================
-        // REPORTS
+        // REPORTS (unchanged)
         // ============================================================
         function initReports() {
             document.getElementById('reportStart').value = '2020-01-01';
@@ -1871,6 +1950,112 @@
                 }));
                 showToast('P&L Report exported!');
             });
+        }
+
+        // ============================================================
+        // CASH & RESTOCK (NEW)
+        // ============================================================
+        function renderCashAndRestock() {
+            // Cash summary
+            let totalSales = 0,
+                totalExpenses = 0;
+            db.sales.forEach(s => { totalSales += s.totalSales || 0; });
+            db.expenses.forEach(e => { totalExpenses += e.amount || 0; });
+            const cashBalance = totalSales - totalExpenses;
+            document.getElementById('cashTotal').textContent = UGX(cashBalance);
+            document.getElementById('cashTotalSales').textContent = UGX(totalSales);
+            document.getElementById('cashTotalExpenses').textContent = UGX(totalExpenses);
+
+            // Daily summary
+            const dailyMap = {};
+            db.sales.forEach(sale => {
+                if (!dailyMap[sale.date]) dailyMap[sale.date] = { sales: 0, profit: 0, expenses: 0 };
+                dailyMap[sale.date].sales += sale.totalSales || 0;
+                dailyMap[sale.date].profit += sale.totalProfit || 0;
+            });
+            db.expenses.forEach(exp => {
+                if (!dailyMap[exp.date]) dailyMap[exp.date] = { sales: 0, profit: 0, expenses: 0 };
+                dailyMap[exp.date].expenses += exp.amount || 0;
+            });
+            const dates = Object.keys(dailyMap).sort();
+            const tbody = document.querySelector('#dailySummaryTable tbody');
+            if (tbody) {
+                if (dates.length === 0) {
+                    tbody.innerHTML =
+                        `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">No data yet.</td></tr>`;
+                } else {
+                    tbody.innerHTML = dates.map(date => {
+                        const d = dailyMap[date];
+                        const net = d.sales - d.expenses;
+                        return `<tr>
+                            <td><strong>${date}</strong></td>
+                            <td>${UGX(d.sales)}</td>
+                            <td><span class="profit-positive">${UGX(d.profit)}</span></td>
+                            <td>${UGX(d.expenses)}</td>
+                            <td><strong>${UGX(net)}</strong></td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+
+            // Restock recommendations
+            const restockItems = [];
+            db.products.forEach(p => {
+                const stock = p.currentStock || 0;
+                const minLevel = p.minStockLevel || 5;
+                // If stock <= min level, urgent
+                if (stock <= minLevel) {
+                    restockItems.push({
+                        product: p,
+                        status: 'Urgent',
+                        suggested: minLevel - stock + 5, // order enough to bring above min
+                        badge: 'restock-badge'
+                    });
+                } else {
+                    // Check sales velocity: sold in last 30 days
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    const dateStr30 = thirtyDaysAgo.toISOString().slice(0, 10);
+                    let sold30 = 0;
+                    db.sales.forEach(sale => {
+                        if (sale.date >= dateStr30) {
+                            sale.items.forEach(item => {
+                                if (item.productId === p.id) sold30 += item.quantity;
+                            });
+                        }
+                    });
+                    const avgDaily = sold30 / 30;
+                    // If stock < avgDaily * 7 (one week's supply) and stock > minLevel, suggest restock
+                    if (avgDaily > 0 && stock < avgDaily * 7) {
+                        restockItems.push({
+                            product: p,
+                            status: 'Consider',
+                            suggested: Math.ceil(avgDaily * 14) - stock, // two weeks supply
+                            badge: 'restock-badge warning'
+                        });
+                    }
+                }
+            });
+
+            const restockTbody = document.querySelector('#restockTable tbody');
+            if (restockTbody) {
+                if (restockItems.length === 0) {
+                    restockTbody.innerHTML =
+                        `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">All products are well-stocked. No restock needed.</td></tr>`;
+                } else {
+                    restockTbody.innerHTML = restockItems.map(item => {
+                        const p = item.product;
+                        return `<tr>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${getCategoryPillHTML(p.category)}</td>
+                            <td>${p.currentStock}</td>
+                            <td>${p.minStockLevel || 5}</td>
+                            <td><span class="${item.badge}">${item.status}</span></td>
+                            <td>${item.suggested > 0 ? item.suggested : '—'}</td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
         }
 
         // ============================================================
@@ -2030,7 +2215,7 @@
         }
 
         // ============================================================
-        // GOOGLE DRIVE
+        // GOOGLE DRIVE (unchanged)
         // ============================================================
         const GOOGLE_CLIENT_ID = "1012401719257-nm0hj0h1na9d7tm8eat4tllgigjrbir0.apps.googleusercontent.com";
         const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
@@ -2254,11 +2439,11 @@
             document.getElementById('periodStart').addEventListener('change', updateDashboardStats);
             document.getElementById('periodEnd').addEventListener('change', updateDashboardStats);
 
-            console.log('Orji Supplies – Sales now work like Products!');
+            console.log('Orji Supplies – Complete business management ready.');
             console.log(
                 `Products: ${db.products.length}, Sales: ${db.sales.length}, Purchases: ${db.purchases.length}, Expenses: ${db.expenses.length}`
                 );
-            showToast('System ready – each sale is a separate record. No sale is ever overwritten!', 'success');
+            showToast('System ready – track cash, restock alerts, and business value!', 'success');
         }
 
         document.addEventListener('DOMContentLoaded', initializeApp);
