@@ -4,9 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Orji Supplies - Management System</title>
-    <meta name="description" content="Fully synchronized stock management with full editability for Orji Supplies">
+    <meta name="description" content="Fully synchronized stock management with simple sales entry – just quantity & sale price.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer>
     </script>
     <style>
@@ -285,7 +284,6 @@
         <button class="bg-pause" id="bgPause" title="Pause/Rotate">⏸️</button>
     </div>
 
-    <!-- Toast Container -->
     <div class="toast-container no-print" id="toastContainer"></div>
 
     <header class="no-print">
@@ -379,10 +377,10 @@
                     <div class="grid-4 no-print" style="margin-bottom:12px;">
                         <div><label>Product</label><select id="saleProduct"></select></div>
                         <div><label>Quantity Sold</label><input type="number" id="saleQty" min="1" value="1"></div>
-                        <div><label>Unit Price (UGX)</label><input type="number" id="salePrice" min="0" value="0"></div>
+                        <div><label>Sale Price (UGX)</label><input type="number" id="salePrice" min="0" value="0"><span class="help" style="margin-top:2px;font-size:11px;">Profit auto-calculated</span></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnAddSaleItem">Add Item</button></div>
                     </div>
-                    <div><table class="table compact-table" id="saleItemsTable"><thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Profit</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
+                    <div><table class="table compact-table" id="saleItemsTable"><thead><tr><th>Product</th><th>Qty</th><th>Sale Price</th><th>Total</th><th>Profit</th><th class="no-print"></th></tr></thead><tbody></tbody></table></div>
                     <div class="right no-print" style="margin-top:16px;">
                         <div class="stat"><span class="muted">Total Sales</span><b id="saleTotal">UGX 0</b></div>
                         <div class="stat"><span class="muted">Total Profit</span><b id="saleProfit">UGX 0</b></div>
@@ -595,7 +593,7 @@
 
     <script>
         // ============================================================
-        // FIVE-STAR SYNC ENGINE with FULL EDITABILITY
+        // FIVE-STAR SYNC ENGINE – with simplified sales entry
         // ============================================================
 
         // ---------- TOAST ----------
@@ -1043,7 +1041,6 @@
             document.getElementById('saleDate').value = date;
             document.getElementById('sheetReference').value = sheet.sheetReference || '';
             updateDailySaleTotal();
-            // Scroll to form
             document.getElementById('sales').scrollIntoView({ behavior: 'smooth' });
             showToast(`Loaded sale for ${date} – modify and re‑save.`, 'warning');
         }
@@ -1059,7 +1056,7 @@
                 const price = parseInt(document.getElementById('salePrice').value) || 0;
                 if (!pid) { showToast('Select a product', 'error'); return; }
                 if (qty <= 0) { showToast('Enter valid quantity', 'error'); return; }
-                if (price <= 0) { showToast('Enter valid price', 'error'); return; }
+                if (price <= 0) { showToast('Enter valid sale price', 'error'); return; }
                 const p = db.products.find(x => x.id === pid);
                 if (!p) { showToast('Product not found', 'error'); return; }
                 const stock = p.currentStock || p.openingStock || 0;
@@ -1082,7 +1079,6 @@
                 showToast(`Removed ${removed.productName}`);
             });
 
-            // Edit sale button (click handler via delegation)
             document.getElementById('salesHistoryTable').addEventListener('click', (e) => {
                 const btn = e.target.closest('[data-edit-sale]');
                 if (!btn) return;
@@ -1095,7 +1091,6 @@
                 const date = document.getElementById('saleDate').value || '2026-07-18';
                 const ref = document.getElementById('sheetReference').value.trim() || 'manual';
 
-                // If a sheet exists, reverse its effect first
                 if (db.dailySheets[date]) {
                     const oldSheet = db.dailySheets[date];
                     oldSheet.items.forEach(item => {
@@ -1108,7 +1103,6 @@
                     });
                 }
 
-                // Apply new items
                 const total = dailySaleItems.reduce((s, i) => s + i.total, 0);
                 const profit = dailySaleItems.reduce((s, i) => s + i.profit, 0);
                 dailySaleItems.forEach(item => {
@@ -1186,7 +1180,6 @@
         }
 
         function setupPurchases() {
-            // Add or Update purchase
             document.getElementById('btnAddPurchase').addEventListener('click', () => {
                 const pid = document.getElementById('purchaseProduct').value;
                 const qty = parseInt(document.getElementById('purchaseQty').value) || 1;
@@ -1201,17 +1194,14 @@
                 if (!product) { showToast('Product not found', 'error'); return; }
 
                 if (editingPurchaseId) {
-                    // Edit mode: reverse old purchase effect
                     const oldPurchase = db.purchases.find(p => p.id === editingPurchaseId);
                     if (oldPurchase) {
                         const oldProduct = db.products.find(x => x.id === oldPurchase.productId);
                         if (oldProduct) {
                             oldProduct.currentStock = Math.max(0, (oldProduct.currentStock || 0) - oldPurchase.quantity);
                         }
-                        // Remove old
                         db.purchases = db.purchases.filter(p => p.id !== editingPurchaseId);
                     }
-                    // Add new (will update stock)
                     const newPurchase = {
                         id: 'pur_' + Date.now(),
                         date,
@@ -1227,7 +1217,6 @@
                     document.getElementById('btnAddPurchase').textContent = 'Add Purchase';
                     showToast('Purchase updated!', 'success');
                 } else {
-                    // Add new
                     db.purchases.push({
                         id: 'pur_' + Date.now(),
                         date,
@@ -1246,12 +1235,10 @@
                 renderProducts();
                 renderInventory();
                 updateDashboardStats();
-                // Reset form fields
                 document.getElementById('purchaseQty').value = '1';
                 document.getElementById('purchaseUnitCost').value = '0';
             });
 
-            // Edit purchase: load data into form
             document.getElementById('purchasesTable').addEventListener('click', (e) => {
                 const editBtn = e.target.closest('[data-edit-purchase]');
                 if (editBtn) {
@@ -1264,13 +1251,11 @@
                     document.getElementById('purchaseQty').value = purchase.quantity;
                     document.getElementById('purchaseUnitCost').value = purchase.unitCost;
                     document.getElementById('btnAddPurchase').textContent = 'Update Purchase';
-                    // Scroll to form
                     document.getElementById('purchases').scrollIntoView({ behavior: 'smooth' });
                     showToast('Loaded purchase for editing', 'warning');
                     return;
                 }
 
-                // Delete purchase
                 const delBtn = e.target.closest('[data-remove-purchase]');
                 if (delBtn) {
                     const id = delBtn.getAttribute('data-remove-purchase');
@@ -1282,16 +1267,16 @@
                         product.currentStock = Math.max(0, (product.currentStock || 0) - purchase.quantity);
                     }
                     db.purchases = db.purchases.filter(p => p.id !== id);
+                    if (editingPurchaseId === id) {
+                        editingPurchaseId = null;
+                        document.getElementById('btnAddPurchase').textContent = 'Add Purchase';
+                    }
                     saveData();
                     renderPurchases();
                     renderProducts();
                     renderInventory();
                     updateDashboardStats();
                     showToast('Purchase deleted and stock reverted.', 'warning');
-                    if (editingPurchaseId === id) {
-                        editingPurchaseId = null;
-                        document.getElementById('btnAddPurchase').textContent = 'Add Purchase';
-                    }
                 }
             });
 
@@ -1344,7 +1329,6 @@
                 if (amt <= 0) { showToast('Enter valid amount', 'error'); return; }
 
                 if (editingExpenseId) {
-                    // Update existing
                     const idx = db.expenses.findIndex(e => e.id === editingExpenseId);
                     if (idx > -1) {
                         db.expenses[idx] = { ...db.expenses[idx], date, type, description: desc, amount: amt };
@@ -1362,7 +1346,6 @@
             });
 
             document.getElementById('expensesTable').addEventListener('click', (e) => {
-                // Edit
                 const editBtn = e.target.closest('[data-edit-expense]');
                 if (editBtn) {
                     const id = editBtn.getAttribute('data-edit-expense');
@@ -1379,7 +1362,6 @@
                     return;
                 }
 
-                // Delete
                 const delBtn = e.target.closest('[data-remove-expense]');
                 if (delBtn) {
                     const id = delBtn.getAttribute('data-remove-expense');
@@ -1842,9 +1824,9 @@
             document.getElementById('periodStart').addEventListener('change', updateDashboardStats);
             document.getElementById('periodEnd').addEventListener('change', updateDashboardStats);
 
-            console.log('Orji Supplies FIVE-STAR System initialized with full editability.');
+            console.log('Orji Supplies System ready – sales only need quantity & sale price.');
             console.log(`Products: ${db.products.length}, Purchases: ${db.purchases.length}, Sales: ${Object.keys(db.dailySheets).length}, Expenses: ${db.expenses.length}`);
-            showToast('Welcome to Orji Supplies Management!', 'success');
+            showToast('Welcome! Enter sale price – profit is auto‑calculated.', 'success');
         }
 
         document.addEventListener('DOMContentLoaded', initializeApp);
