@@ -836,7 +836,7 @@
             const saleSel = document.getElementById('saleProduct');
             const purSel = document.getElementById('purchaseProduct');
             
-            // Build product options for both selects - using the same list for both
+            // Build product options for both selects - showing ALL products
             const productOptions = db.products.map(p => 
                 `<option value="${p.id}" data-price="${p.salePrice}">${p.name} (Stock: ${p.currentStock||0})</option>`
             ).join('');
@@ -927,7 +927,7 @@
             document.getElementById('salePrice').value = ''; 
             updateDailySaleTotal(); 
             loadRecentSales(); 
-            populateProductSelects(); // Ensure products are loaded
+            populateProductSelects(); // Ensure all products are loaded
         }
 
         function updateDailySaleTotal() {
@@ -945,23 +945,38 @@
         }
 
         function loadRecentSales() {
-            const from = document.getElementById('saleFrom').value || todayStr(), to = document.getElementById('saleTo').value || todayStr();
-            const filtered = []; for (const [date, sheet] of Object.entries(db.dailySheets)) { if (date >= from && date <= to) filtered.push({ date, ...sheet }); }
+            const from = document.getElementById('saleFrom').value || todayStr();
+            const to = document.getElementById('saleTo').value || todayStr();
+            
+            // Get ALL sales within the date range
+            const filtered = [];
+            for (const [date, sheet] of Object.entries(db.dailySheets)) {
+                if (date >= from && date <= to) {
+                    filtered.push({ date, ...sheet });
+                }
+            }
+            
+            // Sort by date descending (newest first)
             filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+            
             const tbody = document.querySelector('#salesHistoryTable tbody');
             if (tbody) {
-                tbody.innerHTML = filtered.map(s => {
-                    const profit = s.totalProfit || 0;
-                    const profitClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
-                    return `<tr>
-                        <td><strong>${s.date}</strong></td>
-                        <td>${s.customer || '-'}</td>
-                        <td>${s.items?.length||0} items</td>
-                        <td>${UGX(s.totalSales||0)}</td>
-                        <td class="${profitClass}">${UGX(profit)}</td>
-                        <td class="no-print"><button class="btn edit-btn" data-edit-sale="${s.date}">✎ Edit</button></td>
-                    </tr>`;
-                }).join('');
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">No sales recorded in this period</td></tr>';
+                } else {
+                    tbody.innerHTML = filtered.map(s => {
+                        const profit = s.totalProfit || 0;
+                        const profitClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
+                        return `<tr>
+                            <td><strong>${s.date}</strong></td>
+                            <td>${s.customer || '-'}</td>
+                            <td>${s.items?.length||0} items</td>
+                            <td>${UGX(s.totalSales||0)}</td>
+                            <td class="${profitClass}">${UGX(profit)}</td>
+                            <td class="no-print"><button class="btn edit-btn" data-edit-sale="${s.date}">✎ Edit</button></td>
+                        </tr>`;
+                    }).join('');
+                }
             }
         }
 
