@@ -357,13 +357,18 @@
 
                 <div class="card">
                     <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Sales Report</h3><p>Period: <span id="printSalesPeriod"></span></p><div class="hr"></div></div>
-                    <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Sales</h3><button class="btn" id="btnPrintSalesHistory">Print</button></div>
+                    <div class="section-tools no-print"><h3 style="margin-right:auto">All Sales Records</h3><button class="btn" id="btnPrintSalesHistory">Print</button></div>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
                         <div><label>From Date</label><input type="date" id="saleFrom"></div>
                         <div><label>To Date</label><input type="date" id="saleTo"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterSales">Filter</button></div>
                     </div>
-                    <div><table class="table compact-table" id="salesHistoryTable"><thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total Sales</th><th>Profit/Loss</th><th class="no-print">Actions</th></tr></thead><tbody></tbody></table></div>
+                    <div style="overflow-x:auto;">
+                        <table class="table compact-table" id="salesHistoryTable">
+                            <thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total Sales</th><th>Profit/Loss</th><th class="no-print">Actions</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
@@ -926,8 +931,8 @@
             document.getElementById('saleQty').value = '1'; 
             document.getElementById('salePrice').value = ''; 
             updateDailySaleTotal(); 
-            loadRecentSales(); 
-            populateProductSelects(); // Ensure all products are loaded
+            loadAllSales(); 
+            populateProductSelects();
         }
 
         function updateDailySaleTotal() {
@@ -944,9 +949,9 @@
             }).join('');
         }
 
-        function loadRecentSales() {
-            const from = document.getElementById('saleFrom').value || todayStr();
-            const to = document.getElementById('saleTo').value || todayStr();
+        function loadAllSales() {
+            const from = document.getElementById('saleFrom').value || '1900-01-01';
+            const to = document.getElementById('saleTo').value || '2099-12-31';
             
             // Get ALL sales within the date range
             const filtered = [];
@@ -962,15 +967,19 @@
             const tbody = document.querySelector('#salesHistoryTable tbody');
             if (tbody) {
                 if (filtered.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">No sales recorded in this period</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No sales recorded in this period</td></tr>';
                 } else {
                     tbody.innerHTML = filtered.map(s => {
                         const profit = s.totalProfit || 0;
                         const profitClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
+                        // Build item details string
+                        const itemDetails = s.items.map(item => 
+                            `${item.productName} (${item.quantity} × ${UGX(item.unitPrice)})`
+                        ).join('<br>');
                         return `<tr>
                             <td><strong>${s.date}</strong></td>
                             <td>${s.customer || '-'}</td>
-                            <td>${s.items?.length||0} items</td>
+                            <td><span title="${itemDetails.replace(/"/g, '&quot;')}">${s.items?.length||0} items</span></td>
                             <td>${UGX(s.totalSales||0)}</td>
                             <td class="${profitClass}">${UGX(profit)}</td>
                             <td class="no-print"><button class="btn edit-btn" data-edit-sale="${s.date}">✎ Edit</button></td>
@@ -1065,7 +1074,7 @@
                 editSale(date);
             });
 
-            document.getElementById('btnFilterSales').addEventListener('click', loadRecentSales);
+            document.getElementById('btnFilterSales').addEventListener('click', loadAllSales);
         }
 
         // ================ PURCHASES ================
