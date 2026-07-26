@@ -332,7 +332,6 @@
         <section id="sales" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Sales Entry Form</h3><div class="hr"></div></div>
                     <h3>Record Sales</h3>
                     <div class="grid-3 no-print">
                         <div><label>Date</label><input type="date" id="saleDate"></div>
@@ -356,14 +355,17 @@
                 </div>
 
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Sales Report</h3><p>Period: <span id="printSalesPeriod"></span></p><div class="hr"></div></div>
-                    <div class="section-tools no-print"><h3 style="margin-right:auto">All Sales Records</h3><button class="btn" id="btnPrintSalesHistory">Print</button></div>
+                    <h3>Sales History</h3>
+                    <div class="section-tools no-print">
+                        <button class="btn" id="btnPrintSalesHistory">Print</button>
+                        <button class="btn" id="btnRefreshSales">🔄 Refresh</button>
+                    </div>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
                         <div><label>From Date</label><input type="date" id="saleFrom"></div>
                         <div><label>To Date</label><input type="date" id="saleTo"></div>
                         <div style="align-self:flex-end;"><button class="btn" id="btnFilterSales">Filter</button></div>
                     </div>
-                    <div style="overflow-x:auto;">
+                    <div style="overflow-x:auto; max-height:400px; overflow-y:auto;">
                         <table class="table compact-table" id="salesHistoryTable">
                             <thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total Sales</th><th>Profit/Loss</th><th class="no-print">Actions</th></tr></thead>
                             <tbody></tbody>
@@ -377,7 +379,6 @@
         <section id="purchases" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Purchase Entry Form</h3><div class="hr"></div></div>
                     <h3>Record Purchase</h3>
                     <div class="grid-3 no-print">
                         <div><label>Date</label><input type="date" id="purchaseDate"></div>
@@ -391,8 +392,7 @@
                 </div>
 
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Purchase History</h3><p>Period: <span id="printPurchasePeriod"></span></p><div class="hr"></div></div>
-                    <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Purchases</h3><button class="btn" id="btnPrintPurchases">Print</button></div>
+                    <h3>Purchase History</h3>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
                         <div><label>From Date</label><input type="date" id="purchaseFrom"></div>
                         <div><label>To Date</label><input type="date" id="purchaseTo"></div>
@@ -408,7 +408,6 @@
         <section id="expenses" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Expense Entry Form</h3><div class="hr"></div></div>
                     <h3>Record Expense</h3>
                     <div class="grid-3">
                         <div><label>Date</label><input type="date" id="expenseDate" class="no-print"></div>
@@ -420,8 +419,7 @@
                 </div>
 
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Expenses Report</h3><p>Period: <span id="printExpensesPeriod"></span></p><div class="hr"></div></div>
-                    <div class="section-tools no-print"><h3 style="margin-right:auto">Recent Expenses</h3><button class="btn" id="btnPrintExpenses">Print</button></div>
+                    <h3>Expenses Report</h3>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
                         <div><label>From Date</label><input type="date" id="expenseFrom"></div>
                         <div><label>To Date</label><input type="date" id="expenseTo"></div>
@@ -437,7 +435,6 @@
         <section id="debts" class="tabpanel" style="display:none;">
             <div class="grid-2">
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Debt Entry Form</h3><div class="hr"></div></div>
                     <h3>Record Debt</h3>
                     <div class="grid-2 no-print">
                         <div><label>Date</label><input type="date" id="debtDate"></div>
@@ -459,8 +456,7 @@
                 </div>
 
                 <div class="card">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Debts Report</h3><p>Generated: <span id="printDebtsGenerated"></span></p><div class="hr"></div></div>
-                    <div class="section-tools no-print"><h3 style="margin-right:auto">Debt Management</h3><button class="btn" id="btnPrintDebts">Print</button></div>
+                    <h3>Debt Management</h3>
                     <div class="grid-3 no-print" style="margin-bottom:16px;">
                         <div><label>Status Filter</label><select id="debtFilter"><option value="all">All</option><option value="unpaid">Unpaid</option><option value="paid">Paid</option><option value="partial">Partial</option></select></div>
                         <div><label>From Date</label><input type="date" id="debtFrom"></div>
@@ -477,8 +473,7 @@
         <!-- Reports -->
         <section id="reports" class="tabpanel" style="display:none;">
             <div class="card">
-                <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Profit & Loss Report</h3><p>Period: <span id="printReportPeriod"></span></p><div class="hr"></div></div>
-                <div class="section-tools no-print"><h3 style="margin-right:auto">Profit & Loss Report</h3><button class="btn" id="btnPrintReport">Print</button><button class="btn" id="btnExportReport">Export Excel</button></div>
+                <h3>Profit & Loss Report</h3>
                 <div class="grid-4 no-print">
                     <div><label>Report Period Start</label><input type="date" id="reportStart"></div>
                     <div><label>Report Period End</label><input type="date" id="reportEnd"></div>
@@ -494,7 +489,6 @@
         <section id="products" class="tabpanel" style="display:none;">
             <div class="row">
                 <div class="card" style="grid-column:span 4;">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Product Management</h3><div class="hr"></div></div>
                     <h3>Add / Edit Product</h3>
                     <div><label>Product Name</label><input id="productName" type="text" placeholder="e.g., Notebook" class="no-print"></div>
                     <div style="margin-top:12px;"><label>Category</label><input id="productCategory" type="text" placeholder="e.g., Stationery" class="no-print" list="categorySuggestions"><datalist id="categorySuggestions"></datalist></div>
@@ -514,9 +508,8 @@
                 </div>
 
                 <div class="card" style="grid-column:span 8;">
-                    <div class="print-header print-only"><h2>Orji Supplies</h2><h3>Product List</h3><p>Generated: <span id="printProductsGenerated"></span></p><div class="hr"></div></div>
+                    <h3>Product List</h3>
                     <div class="section-tools no-print" style="margin-bottom:16px;">
-                        <h3 style="margin-right:auto">Product List</h3>
                         <button class="btn" id="btnPrintProducts">Print</button>
                         <input type="text" id="productSearch" placeholder="Search products..." style="flex:1;">
                         <select id="productSort"><option value="name">Sort by Name</option><option value="category">Sort by Category</option><option value="stock">Sort by Stock</option><option value="profit">Sort by Profit Margin</option></select>
@@ -637,7 +630,6 @@
         const UGX = (v) => new Intl.NumberFormat('en-UG', { style: 'currency', currency: 'UGX', maximumFractionDigits: 0 }).format(v || 0);
         const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
         function download(filename, blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
-        function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
         function generateId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6); }
 
         // ================ DATA MANAGEMENT ================
@@ -663,14 +655,12 @@
 
         // ================ RECALCULATION ENGINE ================
         function recalculateAll() {
-            // Reset all product stats
             db.products.forEach(p => {
                 p.soldCount = 0;
                 p.totalProfit = 0;
                 p.currentStock = p.openingStock || 0;
             });
 
-            // Recalculate from purchases
             db.purchases.forEach(pur => {
                 const product = db.products.find(p => p.id === pur.productId);
                 if (product) {
@@ -678,7 +668,6 @@
                 }
             });
 
-            // Recalculate from sales
             Object.values(db.dailySheets).forEach(sheet => {
                 sheet.items.forEach(item => {
                     const product = db.products.find(p => p.name === item.productName);
@@ -688,7 +677,6 @@
                         product.currentStock = Math.max(0, (product.currentStock || 0) - item.quantity);
                     }
                 });
-                // Recalculate sheet totals
                 sheet.totalSales = sheet.items.reduce((s, i) => s + i.total, 0);
                 sheet.totalProfit = sheet.items.reduce((s, i) => s + i.profit, 0);
             });
@@ -697,8 +685,6 @@
         }
 
         // ================ EDIT MODAL ================
-        let editContext = { type: '', id: '', data: null };
-
         function openEditModal(title, html, saveCallback) {
             document.getElementById('editModalTitle').textContent = title;
             document.getElementById('editModalBody').innerHTML = html;
@@ -837,20 +823,24 @@
             datalist.innerHTML = '';
             cats.forEach(c => { const opt = document.createElement('option'); opt.value = c; datalist.appendChild(opt); });
         }
+        
         function populateProductSelects() {
             const saleSel = document.getElementById('saleProduct');
             const purSel = document.getElementById('purchaseProduct');
             
-            // Build product options for both selects - showing ALL products
-            const productOptions = db.products.map(p => 
-                `<option value="${p.id}" data-price="${p.salePrice}">${p.name} (Stock: ${p.currentStock||0})</option>`
-            ).join('');
+            // Build options from ALL products in the database
+            let options = '';
+            if (db.products && db.products.length > 0) {
+                db.products.forEach(p => {
+                    options += `<option value="${p.id}" data-price="${p.salePrice || 0}">${p.name} (Stock: ${p.currentStock || 0})</option>`;
+                });
+            }
             
             if (saleSel) {
-                saleSel.innerHTML = '<option value="">Select Product</option>' + productOptions;
+                saleSel.innerHTML = '<option value="">Select Product</option>' + options;
             }
             if (purSel) {
-                purSel.innerHTML = '<option value="">Select Product</option>' + productOptions;
+                purSel.innerHTML = '<option value="">Select Product</option>' + options;
             }
         }
 
@@ -953,7 +943,6 @@
             const from = document.getElementById('saleFrom').value || '1900-01-01';
             const to = document.getElementById('saleTo').value || '2099-12-31';
             
-            // Get ALL sales within the date range
             const filtered = [];
             for (const [date, sheet] of Object.entries(db.dailySheets)) {
                 if (date >= from && date <= to) {
@@ -961,18 +950,16 @@
                 }
             }
             
-            // Sort by date descending (newest first)
             filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
             
             const tbody = document.querySelector('#salesHistoryTable tbody');
             if (tbody) {
                 if (filtered.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No sales recorded in this period</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No sales recorded</td></tr>';
                 } else {
                     tbody.innerHTML = filtered.map(s => {
                         const profit = s.totalProfit || 0;
                         const profitClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
-                        // Build item details string
                         const itemDetails = s.items.map(item => 
                             `${item.productName} (${item.quantity} × ${UGX(item.unitPrice)})`
                         ).join('<br>');
@@ -1006,8 +993,7 @@
             document.getElementById('saleProduct').addEventListener('change', function() { 
                 const opt = this.options[this.selectedIndex]; 
                 if (opt && opt.value) {
-                    const price = opt.getAttribute('data-price') || '';
-                    document.getElementById('salePrice').value = price;
+                    document.getElementById('salePrice').value = opt.getAttribute('data-price') || '';
                 }
             });
             document.getElementById('btnAddSaleItem').addEventListener('click', () => {
@@ -1075,6 +1061,7 @@
             });
 
             document.getElementById('btnFilterSales').addEventListener('click', loadAllSales);
+            document.getElementById('btnRefreshSales').addEventListener('click', loadAllSales);
         }
 
         // ================ PURCHASES ================
@@ -1725,7 +1712,6 @@
             initBackground();
             setAllDates();
 
-            // Ensure all data is consistent
             recalculateAll();
 
             setupTabs();
@@ -1751,8 +1737,8 @@
             document.getElementById('periodStart').addEventListener('change', updateDashboardStats);
             document.getElementById('periodEnd').addEventListener('change', updateDashboardStats);
 
-            console.log('Orji Supplies Enhanced Management System with Full Edit Support initialized.');
-            console.log(`Products: ${db.products.length}, Purchases: ${db.purchases.length}, Sales: ${Object.keys(db.dailySheets).length}, Expenses: ${db.expenses.length}, Debts: ${db.debts.length}`);
+            console.log('Orji Supplies Enhanced Management System initialized.');
+            console.log(`Products: ${db.products.length}, Sales: ${Object.keys(db.dailySheets).length}`);
         }
 
         document.addEventListener('DOMContentLoaded', initializeApp);
